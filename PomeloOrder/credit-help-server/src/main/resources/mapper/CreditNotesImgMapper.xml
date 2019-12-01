@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.ryit.credithelpserver.dao.CreditNotesImgMapper" >
+  <resultMap id="BaseResultMap" type="com.ryit.commons.entity.pojo.CreditNotesImg" >
+    <result column="id" property="id" jdbcType="INTEGER" />
+    <result column="notes_id" property="notesId" jdbcType="INTEGER" />
+    <result column="img_path" property="imgPath" jdbcType="VARCHAR" />
+  </resultMap>
+
+  <insert id="insertBatch" parameterType="list">
+    insert into credit_notes_img (notes_id, img_path) values
+    <foreach collection="list" item="item" index="index" separator=",">
+      (
+        #{item.notesId,jdbcType=INTEGER}, #{item.imgPath,jdbcType=VARCHAR}
+      )
+    </foreach>
+  </insert>
+
+  <select id="selectImageByNotesId" parameterType="long" resultMap="BaseResultMap">
+    select id,notes_id,img_path from credit_notes_img where notes_id = #{notesId}
+  </select>
+
+  <delete id="deleteBatch" parameterType="list">
+    delete from credit_notes_img where notes_id in
+    <foreach collection="list" item="item" index="index" open="(" separator="," close=")">
+      #{item}
+    </foreach>
+  </delete>
+</mapper>

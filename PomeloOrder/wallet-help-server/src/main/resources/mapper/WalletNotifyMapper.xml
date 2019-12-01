@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ryit.wallethelpserver.dao.WalletNotifyMapper">
+
+    <resultMap type="com.ryit.commons.entity.pojo.WalletNotify" id="BaseResultMap">
+        <result property="id" column="id"/>
+        <result property="banner" column="banner"/>
+        <result property="urlLink" column="url_link"/>
+        <result property="showFlag" column="show_flag"/>
+    </resultMap>
+
+    <insert id="insertWalletNotify" useGeneratedKeys="true" keyProperty="id"
+            parameterType="com.ryit.commons.entity.pojo.WalletNotify">
+        INSERT INTO wallet_notify
+        (
+        <trim suffixOverrides=",">
+            <if test="id!=null">id,</if>
+            <if test="banner!=null">banner,</if>
+            <if test="urlLink!=null">url_link,</if>
+            <if test="showFlag!=null">show_flag,</if>
+        </trim>
+        )
+        VALUES
+        (
+        <trim suffixOverrides=",">
+            <if test="id!=null">#{id},</if>
+            <if test="banner!=null">#{banner},</if>
+            <if test="urlLink!=null">#{urlLink},</if>
+            <if test="showFlag!=null">#{showFlag},</if>
+        </trim>
+        )
+    </insert>
+
+
+    <update id="updateWalletNotify" parameterType="com.ryit.commons.entity.pojo.WalletNotify">
+        UPDATE wallet_notify SET
+        <trim suffixOverrides=",">
+            <if test="banner != null and banner!=''">banner = #{banner},</if>
+            <if test="urlLink != null and urlLink!=''">url_link = #{urlLink},</if>
+            <if test="showFlag != null">show_flag = #{showFlag},</if>
+        </trim>
+        WHERE
+        <trim suffixOverrides="and">id = #{id} and</trim>
+    </update>
+
+    <select id="queryNotify" resultMap="BaseResultMap" parameterType="java.lang.Integer">
+        SELECT id,banner,url_link,show_flag FROM wallet_notify
+        <if test="showFlag != null">
+            WHERE show_flag =#{showFlag}
+        </if>
+    </select>
+
+    <select id="queryNotifyById" resultMap="BaseResultMap" parameterType="java.lang.Long">
+        SELECT id,banner,url_link,show_flag FROM wallet_notify WHERE id =#{id}
+    </select>
+
+    <delete id="deleteWalletNotify" parameterType="java.lang.Long">
+        DELETE FROM wallet_notify WHERE id =#{id}
+    </delete>
+
+</mapper>

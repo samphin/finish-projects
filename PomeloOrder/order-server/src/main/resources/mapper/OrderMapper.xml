@@ -1,0 +1,703 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ryit.orderserver.dao.OrderMapper">
+
+    <resultMap id="BaseResultMap" type="com.ryit.commons.entity.pojo.SysOrder">
+        <result column="id" property="id" jdbcType="INTEGER"/>
+        <result column="order_money" property="orderMoney" jdbcType="DOUBLE"/>
+        <result column="order_term" property="orderTerm" jdbcType="VARCHAR"/>
+        <result column="order_coin" property="orderCoin" jdbcType="DOUBLE"/>
+        <result column="order_reason" property="orderReason" jdbcType="VARCHAR"/>
+        <result column="order_remark" property="orderRemark" jdbcType="VARCHAR"/>
+        <result column="order_status" property="orderStatus" jdbcType="INTEGER"/>
+        <result column="call_flag" property="callFlag" jdbcType="INTEGER"/>
+        <result column="del_flag" property="delFlag" jdbcType="INTEGER"/>
+        <result column="finish_flag" property="finishFlag" jdbcType="INTEGER"/>
+        <result column="release_user_id" property="releaseUserId" jdbcType="INTEGER"/>
+        <result column="release_time" property="releaseTime" jdbcType="TIMESTAMP"/>
+        <result column="wallet_user_id" property="walletUserId" jdbcType="INTEGER"/>
+        <result column="pay_id" property="payId" jdbcType="INTEGER"/>
+        <result column="pay_time" property="payTime" jdbcType="TIMESTAMP"/>
+        <result column="back_reason" property="backReason" jdbcType="VARCHAR"/>
+        <result column="back_id" property="backId" jdbcType="INTEGER"/>
+        <result column="back_time" property="backTime" jdbcType="TIMESTAMP"/>
+        <result column="error_reason" property="errorReason" jdbcType="VARCHAR"/>
+        <result column="back_status" property="backStatus" jdbcType="INTEGER"/>
+        <result column="source" jdbcType="INTEGER" property="source"/>
+        <result column="source_code" jdbcType="VARCHAR" property="sourceCode"/>
+        <result column="source_name" jdbcType="VARCHAR" property="sourceName"/>
+        <result column="source_url" jdbcType="VARCHAR" property="sourceUrl"/>
+        <!--订单基本信息字段-->
+        <result column="edu_level" jdbcType="VARCHAR" property="eduLevel"/>
+        <result column="marital_status" jdbcType="VARCHAR" property="maritalStatus"/>
+        <result column="careers_type" jdbcType="VARCHAR" property="careersType"/>
+        <result column="company_type" jdbcType="VARCHAR" property="companyType"/>
+        <result column="month_cash" jdbcType="VARCHAR" property="monthCash"/>
+        <result column="wages_way" jdbcType="VARCHAR" property="wagesWay"/>
+        <result column="work_age" jdbcType="VARCHAR" property="workAge"/>
+        <result column="city" jdbcType="INTEGER" property="city"/>
+        <result column="company_name" jdbcType="VARCHAR" property="companyName"/>
+        <result column="manager_flow" jdbcType="VARCHAR" property="managerFlow"/>
+        <result column="manager_year" jdbcType="VARCHAR" property="managerYear"/>
+        <result column="business_license" jdbcType="VARCHAR" property="businessLicense"/>
+    </resultMap>
+
+    <sql id="Base_Column_List">
+        id,order_money,order_term,order_coin,order_reason,order_remark,order_status,call_flag,del_flag,finish_flag,release_user_id,
+        release_time,wallet_user_id,pay_id,back_reason,pay_time,back_id,back_time,error_reason,back_status,product_id,edu_level,
+        marital_status,careers_type,company_type,month_cash,wages_way,work_age,city,company_name,manager_flow,manager_year,
+        business_license,source,source_code,source_name,source_url
+    </sql>
+
+    <!--APP首页订单列表-->
+    <select id="selectHomePageOrderList" parameterType="com.ryit.commons.entity.dto.SysOrderQueryDto"
+            resultType="com.ryit.commons.entity.vo.SysOrderVo">
+        SELECT so.id,
+        so.order_money AS orderMoney,
+        so.order_term AS orderTerm,
+        so.release_time AS releaseTime,
+        so.order_status AS orderStatus,
+        (CASE
+        WHEN wu.sex = 0 AND sur.surname IS NULL THEN CONCAT(LEFT(wu.realname,1),'女士')
+        WHEN wu.sex = 0 AND sur.surname IS NOT NULL THEN CONCAT(sur.surname,'女士')
+        WHEN wu.sex = 1 AND sur.surname IS NULL THEN CONCAT(LEFT(wu.realname,1),'先生')
+        WHEN wu.sex = 1 AND sur.surname IS NOT NULL THEN CONCAT(sur.surname,'先生')
+        END) AS realName,sa.area_name AS cityName,
+        so.month_cash AS monthCash,
+        (SELECT soa.label FROM sys_order_aptitude soa WHERE soa.`code` = 'credit_card' AND soa.order_id = so.`id`) AS
+        creditCard,
+        so.wages_way AS wagesWay,
+        (CASE WHEN (SELECT COUNT(id) FROM sys_order_aptitude soa WHERE soa.`code` = 'credit_card' AND soa.`value` != 0
+        AND order_id = so.`id`) >0 THEN '有信用卡' ELSE NULL END) AS creditCardFlag,
+        (CASE WHEN (SELECT COUNT(id) FROM sys_order_aptitude soa WHERE soa.`code` = 'accumulatioin_fund' AND soa.`value`
+        != 0 AND order_id = so.`id`) >0 THEN '有公积金' ELSE NULL END) AS accumulatioinFund,
+        (CASE WHEN (SELECT COUNT(id) FROM sys_order_aptitude soa WHERE soa.`code` = 'social_security' AND soa.`value` !=
+        0 AND order_id = so.`id`) >0 THEN '有社保' ELSE NULL END) AS socialSecurity,
+        (CASE WHEN (SELECT COUNT(id) FROM sys_order_aptitude soa WHERE soa.`code` = 'house_property' AND soa.`value` !=
+        0 AND order_id = so.`id`) >0 THEN '有房产' ELSE NULL END) AS houseProperty,
+        (CASE WHEN (SELECT COUNT(id) FROM sys_order_aptitude soa WHERE soa.`code` = 'car_property' AND soa.`value` != 0
+        AND order_id = so.`id`) >0 THEN '有车产' ELSE NULL END) AS carProperty,
+        (CASE WHEN (SELECT COUNT(id) FROM sys_order_aptitude soa WHERE soa.`code` = 'life_insurance' AND soa.`value` !=
+        0 AND order_id = so.`id`) >0 THEN '有寿险' ELSE NULL END) AS lifeInsurance,
+        (CASE WHEN (SELECT COUNT(id) FROM sys_order_aptitude soa WHERE soa.`code` = 'sesame_credit' AND soa.`value` != 0
+        AND order_id = so.`id`) >0 THEN '有芝麻信用' ELSE NULL END) AS sesameCredit,
+        (CASE WHEN (SELECT COUNT(id) FROM sys_order_aptitude soa WHERE soa.`code` = 'microfinance' AND soa.`value` != 0
+        AND order_id = so.`id`) >0 THEN '有微粒贷' ELSE NULL END) AS microfinance
+        FROM sys_order so
+        LEFT JOIN wallet_user wu ON so.`wallet_user_id` = wu.`id`
+        LEFT JOIN sys_area sa ON sa.code = so.`city`
+        LEFT JOIN sys_surname sur ON wu.realname LIKE CONCAT(sur.surname, '_%')
+        <where>
+            so.del_flag = 0
+            <!--订单表查询字段-->
+            <if test="orderStatus != null and orderStatus == 0">
+                and so.order_status = 0
+            </if>
+            <if test="wagesWay != null and wagesWay == 1">
+                and so.wages_way = '银行代发'
+            </if>
+            <if test="city != null">
+                and so.city = #{city}
+            </if>
+            <!--根据资质字段查询资质对应的订单号然后匹配订单信息-->
+            <if test="aptitudeCode.size()>0">
+                and so.id in (
+                select distinct soa.order_id from sys_order_aptitude soa
+                <where>
+                    soa.value != 0 and soa.code in
+                    <foreach collection="aptitudeCode" open="(" index="index" close=")" item="code" separator=",">
+                        #{code}
+                    </foreach>
+                </where>
+                )
+            </if>
+            <!--如果既查芝麻信用分大于600且或者查询无芝麻信用分则用OR-->
+            <if test="aptitudeCode.size()>0 and sesameCreditFine != null and sesameCreditFine == 1">
+                OR so.id in (
+                select distinct soa.order_id from sys_order_aptitude soa where soa.code = 'sesame_credit' AND soa.value
+                > 1
+                )
+            </if>
+            <!--如果只查芝麻信用分大于600分的则用and-->
+            <if test=" aptitudeCode.size() == 0 and sesameCreditFine != null and sesameCreditFine == 1">
+                AND so.id in (
+                select distinct soa.order_id from sys_order_aptitude soa where soa.code = 'sesame_credit' AND soa.value
+                > 1
+                )
+            </if>
+            order by so.order_status asc, so.release_time desc
+        </where>
+    </select>
+
+    <!--查询首页订单详情-->
+    <select id="selectOrderDetail" parameterType="java.lang.Long"
+            resultType="com.ryit.commons.entity.vo.SysOrderDetailVo">
+        SELECT so.id,
+        so.order_money AS orderMoney,
+        so.order_term AS orderTerm,
+        so.release_time AS releaseTime,
+        so.order_coin AS orderCoin,
+        so.order_reason AS orderReason,
+        so.order_status AS orderStatus,
+        so.edu_level as eduLevel,
+        so.marital_status as maritalStatus,
+        so.careers_type as careersType,
+        so.company_type as companyType,
+        so.month_cash as monthCash,
+        so.wages_way as wagesWay,
+        so.work_age as workAge,
+        so.city,
+        so.company_name as companyName,
+        so.manager_flow as managerFlow,
+        so.manager_year as managerYear,
+        so.business_license as businessLicense,
+        (CASE
+        WHEN wu.sex = 0 AND sur.surname IS NULL THEN CONCAT(LEFT(wu.realname,1),'女士')
+        WHEN wu.sex = 0 AND sur.surname IS NOT NULL THEN CONCAT(sur.surname,'女士')
+        WHEN wu.sex = 1 AND sur.surname IS NULL THEN CONCAT(LEFT(wu.realname,1),'先生')
+        WHEN wu.sex = 1 AND sur.surname IS NOT NULL THEN CONCAT(sur.surname,'先生')
+        END) AS realName,
+        CONCAT(LEFT(wu.phone,3),'********') AS phone,
+        wu.age,
+        sa.area_name AS cityName,
+        so.company_name AS companyName,
+        so.manager_flow AS managerFlow
+        FROM sys_order so
+        LEFT JOIN wallet_user wu ON so.`wallet_user_id` = wu.`id`
+        LEFT JOIN sys_area sa ON sa.code = so.city
+        LEFT JOIN sys_surname sur ON wu.realname LIKE CONCAT(sur.surname, '_%')
+        where so.id = #{id}
+    </select>
+
+    <select id="countOrder" resultType="java.util.Map">
+        select count(1) AS num ,ifnull(sum(order_money),0) AS `sum` from sys_order where left(release_time,10) = left(sysdate(),10)
+    </select>
+
+    <!--查看用户订单列表-->
+    <select id="getOrderListByCreditUser" parameterType="java.lang.Long"
+            resultType="com.ryit.commons.entity.vo.SysOrderVo">
+        SELECT so.id,
+        so.order_money AS orderMoney,
+        so.order_term AS orderTerm,
+        so.order_reason AS orderReason,
+        so.pay_time AS payTime,
+        so.call_flag AS callFlag,
+        so.order_remark AS orderRemark,
+        so.finish_flag as finishFlag,
+        wu.realname AS realName,
+        wu.phone,
+        so.finish_flag AS finishFlag
+        FROM sys_order so
+        LEFT JOIN wallet_user wu ON so.wallet_user_id = wu.id
+        LEFT JOIN credit_bill pay ON pay.id = so.pay_id
+        WHERE
+        so.del_flag = 0 AND so.order_status = 1 AND (back_status = 0 OR back_status = 3)
+        AND pay.user_id = #{creditUserId}
+        ORDER BY so.pay_time DESC
+    </select>
+
+    <!--查看用户订单详情-->
+    <select id="getCreditUserOrderDetail" parameterType="java.lang.Long"
+            resultType="com.ryit.commons.entity.vo.SysOrderDetailVo">
+        SELECT so.id,
+        so.order_money AS orderMoney,
+        so.order_term AS orderTerm,
+        so.release_time AS releaseTime,
+        so.order_coin AS orderCoin,
+        so.order_reason AS orderReason,
+        so.order_status AS orderStatus,
+        so.back_id AS backId,
+        so.back_status AS backStatus,
+        so.back_time AS backTime,
+        so.back_reason AS backReason,
+        so.error_reason AS errorReason,
+        so.pay_id AS payId,
+        so.order_remark AS orderRemark,
+        so.pay_time AS payTime,
+        so.finish_flag as finishFlag,
+        wu.realname AS realName,
+        wu.phone AS phone,
+        wu.age,
+        sa.area_name AS cityName,
+        so.edu_level AS eduLevel,
+        so.marital_status AS maritalStatus,
+        so.careers_type AS careersType,
+        so.company_type AS companyType,
+        so.month_cash AS monthCash,
+        so.wages_way AS wagesWay,
+        so.work_age AS workAge,
+        so.city,
+        so.source,
+        so.company_name AS companyName,
+        so.manager_flow AS managerFlow,
+        so.manager_year AS managerYear,
+        so.business_license AS businessLicense
+        FROM sys_order so
+        LEFT JOIN wallet_user wu ON so.wallet_user_id = wu.id
+        LEFT JOIN sys_area sa ON sa.code = so.city
+        where so.id = #{id}
+    </select>
+
+    <select id="getBackOrderListByCreditUser" parameterType="java.lang.Long"
+            resultType="com.ryit.commons.entity.vo.SysOrderVo">
+        SELECT so.id,
+        so.order_coin AS orderCoin,
+        so.back_time AS backTime,
+        so.back_reason AS backReason,
+        so.back_status AS backStatus,
+        wu.realname AS realName,
+        wu.phone
+        FROM sys_order so LEFT JOIN wallet_user wu ON so.wallet_user_id = wu.id
+        LEFT JOIN credit_bill back ON back.id = so.pay_id
+        WHERE
+        so.del_flag = 0 AND so.finish_flag = 0 AND so.order_status = 1 AND (back_status = 2 OR back_status = 3)
+        and back.user_id = #{creditUserId}
+        order by so.pay_time desc
+    </select>
+
+    <select id="getBackOrderDetail" parameterType="java.lang.Long" resultType="com.ryit.commons.entity.vo.SysOrderVo">
+        select so.id,
+        so.back_reason AS backReason,
+        so.error_reason AS errorReason,
+        so.back_status AS backStatus,
+        group_concat(sob.retuen_img_path) AS backImg
+        from sys_order so left join sys_order_backimg sob on so.id = sob.order_id
+        where so.id = #{id}
+        group by so.id
+    </select>
+
+    <select id="getOrderForBack" parameterType="java.lang.Long" resultType="com.ryit.commons.entity.vo.SysOrderVo">
+        select so.id,so.pay_time AS payTime,cu.back_order_num AS backOrderNum
+        from sys_order so left join credit_bill cb on so.pay_id = cb.id
+        left join credit_user cu on cb.user_id = cu.id
+        where so.id = #{id}
+    </select>
+
+    <!--修改订单信息-->
+    <update id="updateOrder" parameterType="com.ryit.commons.entity.pojo.SysOrder">
+        update sys_order
+        <set>
+            <if test="orderMoney != null">
+                order_money = #{orderMoney},
+            </if>
+            <if test="orderTerm != null and orderTerm != ''">
+                order_term = #{orderTerm},
+            </if>
+            <if test="orderCoin != null">
+                order_coin = #{orderCoin},
+            </if>
+            <if test="orderReason != null and orderReason != ''">
+                order_reason = #{orderReason},
+            </if>
+            <if test="orderRemark != null and orderRemark != ''">
+                order_remark = #{orderRemark},
+            </if>
+            <if test="orderStatus != null">
+                order_status = #{orderStatus},
+            </if>
+            <if test="callFlag != null">
+                call_flag = #{callFlag},
+            </if>
+            <if test="delFlag != null">
+                del_flag = #{delFlag},
+            </if>
+            <if test="finishFlag != null">
+                finish_flag = #{finishFlag},
+            </if>
+            <if test="releaseTime != null">
+                release_time = #{releaseTime},
+            </if>
+            <if test="releaseUserId != null">
+                release_user_id = #{releaseUserId,jdbcType=BIGINT},
+            </if>
+            <if test="walletUserId != null">
+                wallet_user_id = #{walletUserId},
+            </if>
+            <if test="payId != null">
+                pay_id = #{payId},
+            </if>
+            <if test="payTime != null">
+                pay_time = #{payTime},
+            </if>
+            <if test="backId != null">
+                back_id = #{backId},
+            </if>
+            <if test="backTime != null">
+                back_time = #{backTime},
+            </if>
+            <if test="backReason != null and backReason != ''">
+                back_reason = #{backReason},
+            </if>
+            <if test="errorReason != null and errorReason != ''">
+                error_reason = #{errorReason},
+            </if>
+            <if test="backStatus != null">
+                back_status = #{backStatus},
+            </if>
+        </set>
+        where id = #{id}
+    </update>
+
+    <delete id="deleteBackOrderByOrder" parameterType="java.lang.Long">
+        delete from sys_order_backimg where order_id = #{orderId}
+    </delete>
+
+    <insert id="insertBackOrder" keyColumn="id" keyProperty="id"
+            parameterType="com.ryit.commons.entity.pojo.SysOrderReturn" useGeneratedKeys="true">
+        insert into sys_order_backimg (order_id, retuen_img_path) values (#{orderId}, #{retuenImgPath})
+    </insert>
+
+    <select id="getOrderCreditUserById" parameterType="java.lang.Long" resultType="java.lang.Long">
+        select cb.user_id from sys_order so left join credit_bill cb on so.pay_id = cb.id where so.id = #{id}
+    </select>
+
+    <select id="getCoinById" parameterType="java.lang.Long" resultType="java.lang.Double">
+        select so.order_coin from sys_order so where so.id = #{id}
+    </select>
+
+    <update id="deleteOrderById" parameterType="list">
+        update sys_order set del_flag = 1 where id in
+        <foreach collection="list" item="item" index="index" separator="," open="(" close=")">
+            #{item}
+        </foreach>
+    </update>
+
+    <!--PC端查询订单列表-->
+    <select id="selectAllOrders" parameterType="com.ryit.commons.entity.dto.SysOrderListQueryDto"
+            resultType="com.ryit.commons.entity.pojo.SysOrder">
+        SELECT so.id,
+        so.order_money AS orderMoney,
+        so.order_term AS orderTerm,
+        so.order_reason as orderReason,
+        cu.real_name as releaseUserName,
+        so.release_time AS releaseTime,
+        so.order_status AS orderStatus,
+        so.del_flag as delFlag,
+        so.finish_flag as finishFlag,
+        so.call_flag as callFlag,
+        so.order_coin as orderCoin,
+        so.edu_level AS eduLevel,
+        so.marital_status AS maritalStatus,
+        so.careers_type AS careersType,
+        so.company_type AS companyType,
+        so.month_cash AS monthCash,
+        so.wages_way AS wagesWay,
+        so.work_age AS workAge,
+        so.city,
+        so.source,
+        so.source_code as sourceCode,
+        so.source_name as sourceName,
+        so.source_url as sourceUrl,
+        sa.area_name AS cityName,
+        so.company_name AS companyName,
+        so.manager_flow AS managerFlow,
+        so.manager_year AS managerYear,
+        so.business_license AS businessLicense,
+        wu.realname AS realName
+        FROM sys_order so
+        LEFT JOIN wallet_user wu ON so.`wallet_user_id` = wu.`id`
+        LEFT JOIN sys_area sa ON sa.code = so.`city`
+        LEFT JOIN credit_user cu ON cu.id = so.release_user_id
+        LEFT JOIN sys_surname sur ON wu.realname LIKE CONCAT(sur.surname, '_%')
+        <where>
+            <if test="orderMoneyMin != null and orderMoneyMax != null">
+                and so.order_money between #{orderMoneyMin} and #{orderMoneyMax}
+            </if>
+            <if test="orderCoinMin != null and orderCoinMax != null">
+                and so.order_coin between #{orderCoinMin} and #{orderCoinMax}
+            </if>
+            <if test="orderTerm != null">
+                and so.order_term = #{orderTerm}
+            </if>
+            <if test="orderStatus != null">
+                and so.order_status = #{orderStatus}
+            </if>
+            <!--新增需求：2019-10-18 09:00:38-->
+            <if test="realName != null and realName != ''">
+                and wu.realname like concat('%',#{realName,jdbcType=VARCHAR},'%')
+            </if>
+            <if test="phone != null and phone != ''">
+                and wu.phone like concat('%',#{phone,jdbcType=VARCHAR},'%')
+            </if>
+            <if test="releaseUserId != null">
+                and so.release_user_id = #{releaseUserId}
+            </if>
+            <if test="releaseUserName != null and releaseUserName != '' != null">
+                and cu.real_name like concat('%',#{releaseUserName,jdbcType=VARCHAR},'%')
+            </if>
+            <if test="releaseStartTime != null and releaseEndTime != null ">
+                and so.release_time between #{releaseStartTime} and #{releaseEndTime}
+            </if>
+            <choose>
+                <when test="delFlag != null">
+                    and so.del_flag = #{delFlag}
+                </when>
+                <!--默认展示未删除状态订单-->
+                <otherwise>
+                    and so.del_flag = 0
+                </otherwise>
+            </choose>
+            <if test="callFlag != null">
+                and so.call_flag = #{callFlag}
+            </if>
+            <if test="finishFlag != null">
+                and so.finish_flag = #{finishFlag}
+            </if>
+            <if test="backStatus !=null ">
+                and so.back_status = #{backStatus}
+            </if>
+        </where>
+        order by so.release_time desc
+    </select>
+
+    <!--通过订单ID，查询订单信息-->
+    <select id="selectOrderById" parameterType="long" resultMap="BaseResultMap">
+        select
+        <include refid="Base_Column_List"/>
+        from sys_order where id = #{id}
+    </select>
+
+    <!--查询最近一次抢单时间-->
+    <select id="selectLastGrabOrderPayTime" parameterType="map" resultType="java.util.Date">
+        SELECT t1.pay_time FROM sys_order t1,credit_bill t2
+        WHERE t1.pay_id = t2.id AND wallet_user_id = (SELECT wallet_user_id FROM sys_order WHERE id = #{orderId})
+        AND t2.bill_type = 1 AND t2.user_id = #{userId}
+        ORDER BY t1.pay_time DESC LIMIT 0,1
+    </select>
+
+    <select id="getTodayOrderCount" resultType="java.lang.Integer">
+        SELECT count(1) FROM sys_order WHERE DATE_FORMAT(release_time,'%Y-%m-%d') = DATE_FORMAT(sysdate(),'%Y-%m-%d');
+    </select>
+
+    <!--新增订单-->
+    <insert id="insertSelective" keyColumn="id" keyProperty="id" parameterType="com.ryit.commons.entity.pojo.SysOrder"
+            useGeneratedKeys="true">
+        insert into sys_order
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="orderMoney != null">
+                order_money,
+            </if>
+            <if test="orderTerm != null">
+                order_term,
+            </if>
+            <if test="orderCoin != null">
+                order_coin,
+            </if>
+            <if test="orderReason != null">
+                order_reason,
+            </if>
+            <if test="orderRemark != null">
+                order_remark,
+            </if>
+            <if test="orderStatus != null">
+                order_status,
+            </if>
+            <if test="callFlag != null">
+                call_flag,
+            </if>
+            <if test="delFlag != null">
+                del_flag,
+            </if>
+            <if test="finishFlag != null">
+                finish_flag,
+            </if>
+            <if test="releaseUserId != null">
+                release_user_id,
+            </if>
+            <if test="releaseTime != null">
+                release_time,
+            </if>
+            <if test="walletUserId != null">
+                wallet_user_id,
+            </if>
+            <if test="payId != null">
+                pay_id,
+            </if>
+            <if test="backReason != null">
+                back_reason,
+            </if>
+            <if test="payTime != null">
+                pay_time,
+            </if>
+            <if test="backId != null">
+                back_id,
+            </if>
+            <if test="backTime != null">
+                back_time,
+            </if>
+            <if test="errorReason != null">
+                error_reason,
+            </if>
+            <if test="backStatus != null">
+                back_status,
+            </if>
+            <if test="productId != null">
+                product_id,
+            </if>
+            <if test="source != null">
+                source,
+            </if>
+            <if test="sourceCode != null">
+                source_code,
+            </if>
+            <if test="sourceName != null">
+                source_name,
+            </if>
+            <if test="sourceUrl != null">
+                source_url,
+            </if>
+            <if test="eduLevel != null">
+                edu_level,
+            </if>
+            <if test="maritalStatus != null">
+                marital_status,
+            </if>
+            <if test="careersType != null">
+                careers_type,
+            </if>
+            <if test="companyType != null">
+                company_type,
+            </if>
+            <if test="monthCash != null">
+                month_cash,
+            </if>
+            <if test="wagesWay != null">
+                wages_way,
+            </if>
+            <if test="workAge != null">
+                work_age,
+            </if>
+            <if test="city != null">
+                city,
+            </if>
+            <if test="companyName != null">
+                company_name,
+            </if>
+            <if test="managerFlow != null">
+                manager_flow,
+            </if>
+            <if test="managerYear != null">
+                manager_year,
+            </if>
+            <if test="businessLicense != null">
+                business_license,
+            </if>
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="orderMoney != null">
+                #{orderMoney,jdbcType=DOUBLE},
+            </if>
+            <if test="orderTerm != null">
+                #{orderTerm,jdbcType=VARCHAR},
+            </if>
+            <if test="orderCoin != null">
+                #{orderCoin,jdbcType=DOUBLE},
+            </if>
+            <if test="orderReason != null">
+                #{orderReason,jdbcType=VARCHAR},
+            </if>
+            <if test="orderRemark != null">
+                #{orderRemark,jdbcType=VARCHAR},
+            </if>
+            <if test="orderStatus != null">
+                #{orderStatus,jdbcType=BOOLEAN},
+            </if>
+            <if test="callFlag != null">
+                #{callFlag,jdbcType=BOOLEAN},
+            </if>
+            <if test="delFlag != null">
+                #{delFlag,jdbcType=BOOLEAN},
+            </if>
+            <if test="finishFlag != null">
+                #{finishFlag,jdbcType=BOOLEAN},
+            </if>
+            <if test="releaseUserId != null">
+                #{releaseUserId,jdbcType=INTEGER},
+            </if>
+            <if test="releaseTime != null">
+                #{releaseTime,jdbcType=TIMESTAMP},
+            </if>
+            <if test="walletUserId != null">
+                #{walletUserId,jdbcType=INTEGER},
+            </if>
+            <if test="payId != null">
+                #{payId,jdbcType=INTEGER},
+            </if>
+            <if test="backReason != null">
+                #{backReason,jdbcType=VARCHAR},
+            </if>
+            <if test="payTime != null">
+                #{payTime,jdbcType=TIMESTAMP},
+            </if>
+            <if test="backId != null">
+                #{backId,jdbcType=INTEGER},
+            </if>
+            <if test="backTime != null">
+                #{backTime,jdbcType=TIMESTAMP},
+            </if>
+            <if test="errorReason != null">
+                #{errorReason,jdbcType=VARCHAR},
+            </if>
+            <if test="backStatus != null">
+                #{backStatus,jdbcType=BOOLEAN},
+            </if>
+            <if test="productId != null">
+                #{productId,jdbcType=INTEGER},
+            </if>
+            <if test="source != null">
+                #{source,jdbcType=INTEGER},
+            </if>
+            <if test="sourceCode != null">
+                #{sourceCode,jdbcType=VARCHAR},
+            </if>
+            <if test="sourceName != null">
+                #{sourceName,jdbcType=VARCHAR},
+            </if>
+            <if test="sourceUrl != null">
+                #{sourceUrl,jdbcType=VARCHAR},
+            </if>
+            <if test="eduLevel != null">
+                #{eduLevel,jdbcType=VARCHAR},
+            </if>
+            <if test="maritalStatus != null">
+                #{maritalStatus,jdbcType=VARCHAR},
+            </if>
+            <if test="careersType != null">
+                #{careersType,jdbcType=VARCHAR},
+            </if>
+            <if test="companyType != null">
+                #{companyType,jdbcType=VARCHAR},
+            </if>
+            <if test="monthCash != null">
+                #{monthCash,jdbcType=VARCHAR},
+            </if>
+            <if test="wagesWay != null">
+                #{wagesWay,jdbcType=VARCHAR},
+            </if>
+            <if test="workAge != null">
+                #{workAge,jdbcType=VARCHAR},
+            </if>
+            <if test="city != null">
+                #{city,jdbcType=INTEGER},
+            </if>
+            <if test="companyName != null">
+                #{companyName,jdbcType=VARCHAR},
+            </if>
+            <if test="managerFlow != null">
+                #{managerFlow,jdbcType=VARCHAR},
+            </if>
+            <if test="managerYear != null">
+                #{managerYear,jdbcType=VARCHAR},
+            </if>
+            <if test="businessLicense != null">
+                #{businessLicense,jdbcType=VARCHAR},
+            </if>
+        </trim>
+    </insert>
+
+    <select id="queryOrderWithinDay" resultType="java.lang.Integer">
+        SELECT count(1) FROM sys_order so,wallet_user wu WHERE so.wallet_user_id = wu.id AND wu.phone =#{phone} AND
+        so.release_time >=(NOW() - interval 24 hour)
+    </select>
+
+</mapper>

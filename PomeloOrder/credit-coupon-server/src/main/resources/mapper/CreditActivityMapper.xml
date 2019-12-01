@@ -1,0 +1,91 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.ryit.creditcouponserver.dao.CreditActivityMapper">
+    <resultMap id="BaseResultMap" type="com.ryit.commons.entity.pojo.CreditActivity">
+        <result column="id" property="id" jdbcType="INTEGER"/>
+        <result column="title" property="title" jdbcType="VARCHAR"/>
+        <result column="image_url" property="imageUrl" jdbcType="VARCHAR"/>
+        <result column="page_url" property="pageUrl" jdbcType="VARCHAR"/>
+        <result column="visible" property="visible" jdbcType="INTEGER"/>
+        <result column="valid_start_time" property="validStartTime" jdbcType="TIMESTAMP"/>
+        <result column="valid_end_time" property="validEndTime" jdbcType="TIMESTAMP"/>
+        <result column="module_id" property="moduleId" jdbcType="INTEGER"/>
+        <result column="name" property="moduleName" jdbcType="VARCHAR"/>
+        <result column="coin" property="moduleCoin" jdbcType="DOUBLE"/>
+        <result column="discount_coin" property="moduleDiscountCoin" jdbcType="DOUBLE"/>
+    </resultMap>
+
+    <!--查询可以展示的活动-->
+    <select id="selectVisibleActivity" resultMap="BaseResultMap">
+    select id,title,image_url,page_url,module_id,visible,valid_start_time,valid_end_time from credit_activity
+    where CURRENT_DATE BETWEEN valid_start_time AND valid_end_time and visible = 0
+    and SYSDATE() BETWEEN valid_start_time and valid_end_time
+  </select>
+
+    <insert id="insert" parameterType="com.ryit.commons.entity.pojo.CreditActivity">
+        insert into credit_activity (title,image_url, page_url,
+        module_id, visible, valid_start_time,
+        valid_end_time)
+        values (#{title,jdbcType=VARCHAR},#{imageUrl,jdbcType=VARCHAR}, #{pageUrl,jdbcType=VARCHAR},
+        #{moduleId,jdbcType=INTEGER}, #{visible,jdbcType=INTEGER}, #{validStartTime,jdbcType=TIMESTAMP},
+        #{validEndTime,jdbcType=TIMESTAMP})
+    </insert>
+
+    <update id="updateByPrimaryKey" parameterType="com.ryit.commons.entity.pojo.CreditActivity">
+        update credit_activity
+        set
+        title = #{title,jdbcType=VARCHAR},
+        image_url = #{imageUrl,jdbcType=VARCHAR},
+        page_url = #{pageUrl,jdbcType=VARCHAR},
+        module_id = #{moduleId,jdbcType=INTEGER},
+        visible = #{visible,jdbcType=INTEGER},
+        valid_start_time = #{validStartTime,jdbcType=TIMESTAMP},
+        valid_end_time = #{validEndTime,jdbcType=TIMESTAMP}
+        where id = #{id}
+    </update>
+
+    <delete id="deleteByPrimaryKey" parameterType="long">
+        delete from credit_activity where id = #{id}
+    </delete>
+
+    <delete id="deleteBatch" parameterType="list">
+        delete from credit_activity where id in
+        <foreach collection="list" item="item" index="index" open="(" separator="," close=")">
+            #{item}
+        </foreach>
+    </delete>
+
+    <select id="selectAllByCondition" parameterType="com.ryit.commons.entity.pojo.CreditActivity" resultMap="BaseResultMap">
+            SELECT  ca.id,
+                    ca.title,
+                    ca.image_url,
+                    ca.page_url,
+                    ca.visible,
+                    ca.valid_start_time,
+                    ca.valid_end_time,
+                    ca.module_id,
+                    cm.name,
+                    cm.coin,
+                    cm.discount_coin
+            from credit_activity ca
+            left join credit_coupon_module cm on ca.module_id = cm.id
+        <where>
+            <if test="title != null">
+                and ca.title like concat('%',#{title,jdbcType=VARCHAR},'%')
+            </if>
+            <if test="visible != null">
+                and ca.visible = #{visible}
+            </if>
+            <if test="validStartTime != null and validEndTime != null">
+                AND SYSDATE() BETWEEN ca.valid_start_time and ca.valid_end_time
+            </if>
+        </where>
+    </select>
+
+    <select id="selectByPrimaryKey" parameterType="long" resultMap="BaseResultMap">
+        select id ,title, image_url, page_url,
+        module_id, visible, valid_start_time,
+        valid_end_time from credit_activity where id = #{id}
+    </select>
+
+</mapper>

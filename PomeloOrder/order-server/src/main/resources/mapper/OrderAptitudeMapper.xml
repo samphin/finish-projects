@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ryit.orderserver.dao.SysOrderAptitudeMapper">
+
+    <resultMap id="BaseResultMap" type="com.ryit.commons.entity.pojo.SysOrderAptitude">
+        <result column="id" property="id" jdbcType="INTEGER"/>
+        <result column="name" property="name" jdbcType="VARCHAR"/>
+        <result column="code" property="code" jdbcType="VARCHAR"/>
+        <result column="label" property="label" jdbcType="VARCHAR"/>
+        <result column="value" property="value" jdbcType="INTEGER"/>
+        <result column="score" property="score" jdbcType="INTEGER"/>
+        <result column="priority" property="priority" jdbcType="INTEGER"/>
+        <result column="order_id" property="orderId" jdbcType="INTEGER"/>
+    </resultMap>
+
+    <!--查询订单资质信息-->
+    <select id="selectAllByOrderId" parameterType="long" resultMap="BaseResultMap">
+        select id,name,code,label,value,score,priority,order_id from sys_order_aptitude
+        where order_id = #{orderId}
+    </select>
+
+    <!--根据条件选选出资质信息对应的订单-->
+    <select id="selectOrderIdByCondition" parameterType="com.ryit.commons.entity.dto.SysOrderQueryDto" resultType="long">
+        select distinct soa.order_id from sys_order_aptitude soa
+        <where>
+            <!--根据从表字段筛选出订单，然后将订单ID与主表订单进行匹配。多个从表字段筛选出来的订单ID-->
+            <if test="socialSecurity != null and socialSecurity  == 1">
+                and soa.code = 'social_security' AND soa.value != 0
+            </if>
+            <if test="accumulatioinFund != null and accumulatioinFund  == 1">
+                and soa.code = 'accumulatioin_fund' and soa.value != 0
+            </if>
+            <if test="houseProperty != null and houseProperty  == 1">
+                and soa.code = 'house_property' AND soa.value != 0
+            </if>
+            <if test="carProperty != null and carProperty  == 1">
+                and soa.code = 'car_property' AND soa.value != 0
+            </if>
+            <if test="lifeInsurance != null and lifeInsurance  == 1">
+                and soa.code = 'life_insurance' AND soa.value != 0
+            </if>
+            <if test="sesameCredit != null and sesameCredit  == 1">
+                and soa.code = 'sesame_credit' AND soa.value != 0
+            </if>
+            <if test="sesameCreditFine != null and sesameCreditFine  == 1">
+                and soa.code = 'sesame_credit' AND soa.value NOT IN(0,1)
+            </if>
+            <if test="microfinance != null and microfinance  == 1">
+                and soa.code = 'microfinance' AND soa.value != 0
+            </if>
+            <if test="creditCardFlag != null and creditCardFlag  == 1">
+                and soa.code = 'credit_card' AND soa.value != 0
+            </if>
+        </where>
+    </select>
+
+    <insert id="batchInsertAptitude" parameterType="list">
+        insert into sys_order_aptitude(name,code,value,label,score,priority,order_id) values
+        <foreach collection="list" item="item" separator="," index="index">
+            (
+                #{item.name},
+                #{item.code},
+                #{item.value},
+                #{item.label},
+                #{item.score},
+                #{item.priority},
+                #{item.orderId}
+            )
+        </foreach>
+    </insert>
+
+</mapper>

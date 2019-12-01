@@ -1,0 +1,242 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ryit.walletproductserver.dao.WalletLoanProductMapper">
+
+    <resultMap type="com.ryit.commons.entity.vo.WalletLoanProductVo" id="BaseResultMap">
+        <result property="id" column="id"/>
+        <result property="productName" column="product_name"/>
+        <result property="maxQuota" column="max_quota"/>
+        <result property="monthlyRate" column="monthly_rate"/>
+        <result property="loanTerm" column="loan_term"/>
+        <result property="icon" column="icon"/>
+        <result property="label" column="label"/>
+        <result property="customType" column="custom_type"/>
+        <result property="incomeRequire" column="Income_require"/>
+        <result property="workYears" column="work_years"/>
+        <result property="arrivalRate" column="arrival_rate"/>
+        <result property="dailyRate" column="daily_rate"/>
+        <result property="creditInfo" column="credit_info"/>
+        <result property="age" column="age"/>
+        <result property="repaymentFee" column="repayment_fee"/>
+        <result property="monthlySupply" column="monthly_supply"/>
+        <result property="costDescription" column="cost_description"/>
+        <result property="totalCost" column="total_cost"/>
+        <result property="level" column="level"/>
+        <result property="applicationConditions" column="application_conditions"/>
+    </resultMap>
+
+    <sql id="allResult">
+        <trim suffixOverrides=",">
+            id,
+            product_name,
+            max_quota,
+            monthly_rate,
+            loan_term,
+            icon,
+            label,
+            custom_type,
+            Income_require,
+            work_years,
+            arrival_rate,
+            daily_rate,
+            credit_info,
+            age,
+            repayment_fee,
+            monthly_supply,
+            cost_description,
+            total_cost,
+            level,
+            application_conditions,
+        </trim>
+    </sql>
+
+    <insert id="insertWalletLoanProduct" keyColumn="id" keyProperty="id"
+            parameterType="com.ryit.commons.entity.pojo.WalletLoanProduct" useGeneratedKeys="true">
+        INSERT INTO wallet_loan_product
+        (
+        <trim suffixOverrides=",">
+            <if test="id != null">id,</if>
+            <if test="productName != null">product_name,</if>
+            <if test="maxQuota != null">max_quota,</if>
+            <if test="monthlyRate != null">monthly_rate,</if>
+            <if test="loanTerm != null">loan_term,</if>
+            <if test="icon != null">icon,</if>
+            <if test="label != null">label,</if>
+            <if test="customType != null">custom_type,</if>
+            <if test="incomeRequire != null">Income_require,</if>
+            <if test="workYears != null">work_years,</if>
+            <if test="arrivalRate!=null">arrival_rate,</if>
+            <if test="dailyRate!=null">daily_rate,</if>
+            <if test="creditInfo!=null">credit_info,</if>
+            <if test="age!=null">age,</if>
+            <if test="repaymentFee!=null">repayment_fee,</if>
+            <if test="monthlySupply!=null">monthly_supply,</if>
+            <if test="costDescription!=null">cost_description,</if>
+            <if test="totalCost!=null">total_cost,</if>
+            <if test="level!=null">level,</if>
+            <if test="applicationConditions!=null">application_conditions,</if>
+        </trim>
+        )
+        VALUES
+        (
+        <trim suffixOverrides=",">
+            <if test="id != null">#{id},</if>
+            <if test="productName != null">#{productName},</if>
+            <if test="maxQuota != null">#{maxQuota},</if>
+            <if test="monthlyRate != null">#{monthlyRate},</if>
+            <if test="loanTerm != null">#{loanTerm},</if>
+            <if test="icon != null">#{icon},</if>
+            <if test="label != null">#{label},</if>
+            <if test="customType != null">#{customType},</if>
+            <if test="incomeRequire != null">#{incomeRequire},</if>
+            <if test="workYears != null">#{workYears},</if>
+            <if test="arrivalRate!=null">#{arrivalRate},</if>
+            <if test="dailyRate!=null">#{dailyRate},</if>
+            <if test="creditInfo!=null">#{creditInfo},</if>
+            <if test="age!=null">#{age},</if>
+            <if test="repaymentFee!=null">#{repaymentFee},</if>
+            <if test="monthlySupply!=null">#{monthlySupply},</if>
+            <if test="costDescription!=null">#{costDescription},</if>
+            <if test="totalCost!=null">#{totalCost},</if>
+            <if test="level!=null">#{level},</if>
+            <if test="applicationConditions!=null">#{applicationConditions},</if>
+        </trim>
+        )
+    </insert>
+
+    <update id="updateWalletLoanProduct" parameterType="com.ryit.commons.entity.pojo.WalletLoanProduct">
+        UPDATE wallet_loan_product SET
+        <trim suffixOverrides=",">
+            <if test="productName != null and productName!=''">product_name = #{productName},</if>
+            <if test="maxQuota != null">max_quota = #{maxQuota},</if>
+            <if test="monthlyRate != null">monthly_rate = #{monthlyRate},</if>
+            <if test="loanTerm != null and loanTerm!=''">loan_term = #{loanTerm},</if>
+            <if test="icon != null and icon!=''">icon = #{icon},</if>
+            <if test="label != null and label!=''">label = #{label},</if>
+            <if test="customType != null and customType!=''">custom_type = #{customType},</if>
+            <if test="incomeRequire != null and incomeRequire!=''">Income_require = #{incomeRequire},</if>
+            <if test="workYears != null and workYears!=''">work_years = #{workYears},</if>
+            <if test="arrivalRate != null and arrivalRate!=''">arrival_rate = #{arrivalRate},</if>
+            <if test="dailyRate != null">daily_rate = #{dailyRate},</if>
+            <if test="creditInfo != null and creditInfo!=''">credit_info = #{creditInfo},</if>
+            <if test="age != null">age = #{age},</if>
+            <if test="repaymentFee != null and repaymentFee!=''">repayment_fee = #{repaymentFee},</if>
+            <if test="monthlySupply != null">monthly_supply = #{monthlySupply},</if>
+            <if test="costDescription != null and costDescription!=''">cost_description = #{costDescription},</if>
+            <if test="totalCost != null">total_cost = #{totalCost},</if>
+            <if test="level != null">level = #{level},</if>
+            <if test="applicationConditions != null and applicationConditions!=''">application_conditions =
+                #{applicationConditions},
+            </if>
+        </trim>
+        WHERE
+        <trim suffixOverrides="and">id = #{id} and</trim>
+    </update>
+
+    <select id="queryWalletLoanProductList" resultMap="BaseResultMap"
+            parameterType="com.ryit.commons.entity.dto.WalletLoanProductDto">
+        SELECT
+        <include refid="allResult"/>
+        FROM wallet_loan_product
+        <trim prefix="where" suffixOverrides="and | or">
+            <if test="productName != null and productName!=''">
+                product_name like concat('%',#{productName},'%') and
+            </if>
+            <if test="maxQuota != null">
+                max_quota = #{maxQuota} and
+            </if>
+            <if test="monthlyRate != null">
+                monthly_rate = #{monthlyRate} and
+            </if>
+            <if test="loanTerm != null and loanTerm!=''">
+                loan_term = #{loanTerm} and
+            </if>
+            <if test="icon != null and icon!=''">
+                icon = #{icon} and
+            </if>
+            <if test="label != null and label!=''">
+                label like concat('%',#{label},'%') and
+            </if>
+            <if test="customType != null and customType!=''">
+                custom_type = #{customType} and
+            </if>
+            <if test="incomeRequire != null and incomeRequire!=''">
+                Income_require = #{incomeRequire} and
+            </if>
+            <if test="workYears != null and workYears!=''">
+                work_years = #{workYears} and
+            </if>
+            <if test="arrivalRate != null and arrivalRate!=''">
+                arrival_rate = #{arrivalRate} and
+            </if>
+            <if test="dailyRate != null">
+                daily_rate = #{dailyRate} and
+            </if>
+            <if test="creditInfo != null and creditInfo!=''">
+                credit_info = #{creditInfo} and
+            </if>
+            <if test="age != null">
+                age = #{age} and
+            </if>
+            <if test="repaymentFee != null and repaymentFee!=''">
+                repayment_fee = #{repaymentFee} and
+            </if>
+            <if test="monthlySupply != null">
+                monthly_supply = #{monthlySupply} and
+            </if>
+            <if test="costDescription != null and costDescription!=''">
+                cost_description = #{costDescription} and
+            </if>
+            <if test="totalCost != null">
+                total_cost = #{totalCost} and
+            </if>
+            <if test="level != null">
+                level = #{level} and
+            </if>
+            <if test="applicationConditions != null and applicationConditions!=''">
+                application_conditions = #{applicationConditions} and
+            </if>
+        </trim>
+    </select>
+
+    <select id="queryWalletLoanProductById" resultMap="BaseResultMap">
+        SELECT
+        <include refid="allResult"/>
+        FROM wallet_loan_product WHERE id =#{id}
+    </select>
+
+    <delete id="deleteWalletLoanProduct" parameterType="java.lang.Long">
+        DELETE FROM wallet_loan_product WHERE id IN
+        <foreach collection="ids" index="index" item="item" open="(" separator="," close=")">
+            #{item}
+        </foreach>
+    </delete>
+
+    <resultMap id="OrderResultMap" type="com.ryit.commons.entity.vo.WalletLoanProductVo">
+        <result property="id" column="id"/>
+        <result property="productName" column="product_name"/>
+        <result property="maxQuota" column="max_quota"/>
+        <result property="monthlyRate" column="monthly_rate"/>
+        <result property="loanTerm" column="loan_term"/>
+        <result property="icon" column="icon"/>
+        <result property="label" column="label"/>
+        <result property="customType" column="custom_type"/>
+        <result property="incomeRequire" column="Income_require"/>
+        <result property="workYears" column="work_years"/>
+        <result property="orderId" column="order_id"/>
+        <result property="releaseTime" column="release_time"/>
+        <result property="orderStatus" column="order_status"/>
+    </resultMap>
+
+    <select id="queryUserProduct" parameterType="java.lang.Long" resultMap="OrderResultMap">
+        SELECT so.id as order_id,so.release_time,so.order_status, wlp.id ,wlp.product_name,wlp.icon,
+        wlp.label,wlp.loan_term,
+        ifnull(wlp.max_quota,(SELECT dict_value FROM sys_dict WHERE dict_type ='wallet_max_quota')) AS max_quota,
+        ifnull(wlp.monthly_rate,(SELECT dict_value FROM sys_dict WHERE dict_type ='wallet_monthly_rate')) AS monthly_rate ,
+        so.release_time
+        FROM sys_order so
+        LEFT JOIN wallet_loan_product wlp ON so.product_id = wlp.id
+        WHERE so.wallet_user_id =#{walletUserId}
+    </select>
+
+</mapper>

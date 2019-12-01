@@ -1,0 +1,29 @@
+spring:
+  application:
+    name: credit-web-gateway
+server:
+  port: 8089
+eureka:
+  client:
+    service-url:
+      defaultZone: http://root:root@zone2:8081/eureka,http://root:root@zone1:8080/eureka
+zuul:
+  ignored-services: credit-api-server,quartz-server,solr-server,wallet-user-server,wallet-api-server,wallet-web-server,wallet-market-server,wallet-news-server,wallet-product-server
+  #默认全拦截Cookie,Set-Cookie,Authorization
+  #仅过滤掉Cookie,Set-Cookie使Authorization通行
+  #  sensitive-headers: Cookie,Set-Cookie
+  host:
+    connect-timeout-millis: 15000 #HTTP连接超时要比Hystrix的大
+    socket-timeout-millis: 60000   #socket超时
+ribbon:
+  ReadTimeout: 10000
+  ConnectTimeout: 10000
+
+# JWT认证加密私钥(Base64加密)
+encryptJWTKey: MTIzNDU2
+# AccessToken过期时间(秒为单位)
+accessTokenExpireTime: 300 #60*30
+# RefreshToken过期时间(秒为单位)
+refreshTokenExpireTime: 1800 #60*30
+# Shiro缓存过期时间(秒为单位)(一般设置与AccessToken过期时间一致)
+shiroCacheExpireTime: 300 #60*30

@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.ryit.creditcouponserver.dao.CreditRechargeMapper" >
+  <resultMap id="BaseResultMap" type="com.ryit.commons.entity.pojo.CreditRecharge" >
+    <result column="id" property="id" jdbcType="INTEGER" />
+    <result column="money" property="money" jdbcType="DOUBLE" />
+    <result column="gift" property="gift" jdbcType="DOUBLE" />
+    <result column="recharge_type" property="rechargeType" jdbcType="INTEGER" />
+  </resultMap>
+
+  <select id="selectRechargeByMoney" parameterType="com.ryit.commons.entity.pojo.CreditRecharge" resultType="integer">
+    select count(money) from credit_recharge where money = #{money} and recharge_type = #{rechargeType}
+  </select>
+
+  <insert id="insert" parameterType="com.ryit.commons.entity.pojo.CreditRecharge" >
+    insert into credit_recharge (money, gift,recharge_type)
+    values (#{money,jdbcType=DOUBLE}, #{gift,jdbcType=DOUBLE} ,#{rechargeType,jdbcType=INTEGER})
+  </insert>
+
+  <update id="updateByPrimaryKey" parameterType="com.ryit.commons.entity.pojo.CreditRecharge" >
+    update credit_recharge
+    <set>
+        <if test="money != null">
+          money = #{money,jdbcType=DOUBLE},
+        </if>
+        <if test="gift != null">
+          gift = #{gift,jdbcType=INTEGER},
+        </if>
+        <if test="rechargeType != null">
+          recharge_type = #{rechargeType,jdbcType=INTEGER},
+        </if>
+    </set>
+    where id = #{id,jdbcType=INTEGER}
+  </update>
+
+  <delete id="deleteByPrimaryKey" parameterType="long">
+    delete from credit_recharge where id = #{id,jdbcType=INTEGER}
+  </delete>
+
+  <delete id="deleteBatch" parameterType="list">
+    delete from credit_recharge where id in
+    <foreach collection="list" item="item" index="index" open="(" separator="," close=")">
+      #{item}
+    </foreach>
+  </delete>
+
+  <select id="selectAllByCondition" parameterType="com.ryit.commons.entity.pojo.CreditRecharge" resultMap="BaseResultMap">
+    select id ,money, gift,recharge_type from credit_recharge
+    <where>
+      <if test="rechargeType != null">
+        recharge_type = #{rechargeType}
+      </if>
+    </where>
+    order by recharge_type,money
+  </select>
+
+  <select id="selectByPrimaryKey" parameterType="long" resultMap="BaseResultMap">
+    select id ,money, gift,recharge_type from credit_recharge where id = #{id}
+  </select>
+</mapper>

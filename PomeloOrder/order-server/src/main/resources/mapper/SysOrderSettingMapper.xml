@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.ryit.orderserver.dao.SysOrderSettingMapper">
+    <resultMap id="BaseResultMap" type="com.ryit.commons.entity.pojo.SysOrderSetting">
+        <result column="id" property="id" jdbcType="INTEGER"/>
+        <result column="scope_min" property="scopeMin" jdbcType="INTEGER"/>
+        <result column="scope_max" property="scopeMax" jdbcType="INTEGER"/>
+        <result column="score" property="score" jdbcType="INTEGER"/>
+    </resultMap>
+
+    <!--批量插入订单设置信息-->
+    <insert id="insertBatch" parameterType="list">
+        insert into sys_order_setting(scope_min,scope_max,score) values
+        <foreach collection="list" item="item" index="index" separator=",">
+            (
+                #{item.scopeMin,jdbcType=INTEGER},
+                #{item.scopeMax,jdbcType=INTEGER},
+                #{item.score,jdbcType=INTEGER}
+            )
+        </foreach>
+    </insert>
+
+    <!--清空表数据-->
+    <delete id="clearAllData" parameterType="long">
+        delete from sys_order_setting
+    </delete>
+
+    <!--查询所有订单金额设置信息-->
+    <select id="selectAllCondition" resultMap="BaseResultMap">
+        select scope_min,scope_max,score from sys_order_setting
+        <where>
+            <if test="scopeMin != null">
+                scope_min = #{scopeMin,jdbcType=INTEGER},
+            </if>
+            <if test="scopeMax != null">
+                scope_max = #{scopeMax,jdbcType=INTEGER},
+            </if>
+            <if test="score != null">
+                score = #{score,jdbcType=INTEGER},
+            </if>
+        </where>
+        order by score
+    </select>
+</mapper>

@@ -1,0 +1,133 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//ibatis.apache.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ryit.walletuserserver.dao.WalletMenuMapper">
+
+    <resultMap type="com.ryit.commons.entity.pojo.WalletMenu" id="WalletMenuMap">
+        <result property="menuId" column="menu_id"/>
+        <result property="menuName" column="menu_name"/>
+        <result property="parentId" column="parent_id"/>
+        <result property="orderNum" column="order_num"/>
+        <result property="url" column="url"/>
+        <result property="menuType" column="menu_type"/>
+        <result property="visible" column="visible"/>
+        <result property="perms" column="perms"/>
+        <result property="icon" column="icon"/>
+    </resultMap>
+
+    <resultMap type="com.ryit.commons.entity.vo.WalletMenuVo" id="ResultMap">
+        <result property="menuId" column="menu_id"/>
+        <result property="menuName" column="menu_name"/>
+        <result property="parentId" column="parent_id"/>
+        <result property="orderNum" column="order_num"/>
+        <result property="url" column="url"/>
+        <result property="menuType" column="menu_type"/>
+        <result property="visible" column="visible"/>
+        <result property="perms" column="perms"/>
+        <result property="icon" column="icon"/>
+    </resultMap>
+
+    <sql id="allResult">
+        <trim suffixOverrides=",">
+            menu_id,
+            menu_name,
+            parent_id,
+            order_num,
+            url,
+            menu_type,
+            visible,
+            perms,
+            icon,
+        </trim>
+    </sql>
+
+    <insert id="insertWalletMenu" useGeneratedKeys="true" keyProperty="menuId"
+            parameterType="com.ryit.commons.entity.pojo.WalletMenu">
+        INSERT INTO wallet_menu
+        (
+        <trim suffixOverrides=",">
+            <if test="menuId!=null">menu_id,</if>
+            <if test="menuName!=null">menu_name,</if>
+            <if test="parentId!=null">parent_id,</if>
+            <if test="orderNum!=null">order_num,</if>
+            <if test="url!=null">url,</if>
+            <if test="menuType!=null">menu_type,</if>
+            <if test="visible!=null">visible,</if>
+            <if test="perms!=null">perms,</if>
+            <if test="icon!=null">icon,</if>
+        </trim>
+        )
+        VALUES
+        (
+        <trim suffixOverrides=",">
+            <if test="menuId!=null">#{menuId},</if>
+            <if test="menuName!=null">#{menuName},</if>
+            <if test="parentId!=null">#{parentId},</if>
+            <if test="orderNum!=null">#{orderNum},</if>
+            <if test="url!=null">#{url},</if>
+            <if test="menuType!=null">#{menuType},</if>
+            <if test="visible!=null">#{visible},</if>
+            <if test="perms!=null">#{perms},</if>
+            <if test="icon!=null">#{icon},</if>
+        </trim>
+        )
+    </insert>
+
+    <update id="updateWalletMenu" parameterType="com.ryit.commons.entity.pojo.WalletMenu">
+        UPDATE wallet_menu SET
+        <trim suffixOverrides=",">
+            <if test="menuName != null and menuName!=''">menu_name = #{menuName},</if>
+            <if test="parentId != null">parent_id = #{parentId},</if>
+            <if test="orderNum != null">order_num = #{orderNum},</if>
+            <if test="url != null and url!=''">url = #{url},</if>
+            <if test="menuType != null and menuType!=''">menu_type = #{menuType},</if>
+            <if test="visible != null and visible!=''">visible = #{visible},</if>
+            <if test="perms != null and perms!=''">perms = #{perms},</if>
+            <if test="icon != null and icon!=''">icon = #{icon},</if>
+        </trim>
+        WHERE
+        <trim suffixOverrides="and">menu_id = #{menuId} and</trim>
+    </update>
+
+    <delete id="deleteWalletMenu" parameterType="java.lang.Long">
+        DELETE FROM wallet_menu WHERE menu_id=#{menuId}
+    </delete>
+
+    <select id="queryMenuList" resultMap="ResultMap">
+        SELECT
+        <include refid="allResult"/>
+        FROM wallet_menu ORDER BY order_num ASC
+    </select>
+
+    <select id="queryRoleMenu" resultMap="ResultMap">
+        SELECT
+          wm.menu_id,wm.menu_name,wm.parent_id,wm.order_num,wm.url,wm.menu_type,wm.visible,wm.perms,wm.icon
+        FROM wallet_menu wm
+        LEFT JOIN wallet_role_menu wrm ON wm.menu_id = wrm.menu_id
+        WHERE wrm.role_id =#{roleId}
+    </select>
+
+    <select id="queryMenuById" resultMap="WalletMenuMap" parameterType="java.lang.Long">
+        SELECT
+        <include refid="allResult"/>
+        FROM wallet_menu WHERE menu_id = #{menuId}
+    </select>
+
+    <select id="queryUserMenuList" resultMap="ResultMap" parameterType="java.lang.Long">
+        SELECT
+        wm.menu_id,wm.menu_name,wm.parent_id,wm.order_num,wm.url,wm.menu_type,wm.visible,wm.perms,wm.icon
+        FROM wallet_menu wm
+        LEFT JOIN wallet_role_menu wrm ON wrm.menu_id = wm.menu_id
+        LEFT JOIN wallet_user_role wur ON wrm.role_id = wur.role_id
+        WHERE wur.user_id =#{userId} ORDER BY wm.order_num ASC
+    </select>
+
+    <select id="queryNotParentMenuId" resultType="java.lang.Long">
+        SELECT wrm.menu_id FROM wallet_role_menu wrm ,
+          (SELECT menu_id FROM wallet_menu WHERE menu_id NOT IN
+            (SELECT DISTINCT parent_id FROM wallet_menu WHERE parent_id != 0)) menuIds
+      WHERE wrm.menu_id = menuIds.menu_id
+      AND wrm.role_id =#{roleId}
+    </select>
+
+</mapper>

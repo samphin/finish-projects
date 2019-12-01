@@ -1,0 +1,138 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ryit.walletnewsserver.dao.WalletContentMapper">
+
+    <sql id="allResult">
+        <trim suffixOverrides=",">
+            id,
+            create_time,
+            recommend_flag,
+            recommend_level,
+            news_cover,
+            origin,
+            news_title,
+            txt,
+            type_id,
+            parent_type_id,
+            read_count,
+        </trim>
+    </sql>
+
+    <resultMap type="com.ryit.commons.entity.vo.WalletContentVo" id="WalletContentMap">
+        <result property="id" column="id"/>
+        <result property="createTime" column="create_time"/>
+        <result property="recommendFlag" column="recommend_flag"/>
+        <result property="recommendLevel" column="recommend_level"/>
+        <result property="newsCover" column="news_cover"/>
+        <result property="origin" column="origin"/>
+        <result property="delFlag" column="del_flag"/>
+        <result property="newsTitle" column="news_title"/>
+        <result property="txt" column="txt"/>
+        <result property="typeId" column="type_id"/>
+        <result property="parentTypeId" column="parent_type_id"/>
+        <result property="readCount" column="read_count"/>
+    </resultMap>
+
+    <insert id="insertWalletContent" useGeneratedKeys="true" keyProperty="id"
+            parameterType="com.ryit.commons.entity.pojo.WalletContent">
+        INSERT INTO wallet_content
+        (
+        <trim suffixOverrides=",">
+            <if test="id!=null">id,</if>
+            <if test="createTime!=null">create_time,</if>
+            <if test="recommendFlag!=null">recommend_flag,</if>
+            <if test="recommendLevel!=null">recommend_level,</if>
+            <if test="newsCover!=null">news_cover,</if>
+            <if test="origin!=null">origin,</if>
+            <if test="delFlag!=null">del_flag,</if>
+            <if test="newsTitle!=null">news_title,</if>
+            <if test="txt!=null">txt,</if>
+            <if test="typeId!=null">type_id,</if>
+            <if test="parentTypeId!=null">parent_type_id,</if>
+            <if test="readCount!=null">read_count,</if>
+        </trim>
+        )
+        VALUES
+        (
+        <trim suffixOverrides=",">
+            <if test="id!=null">#{id},</if>
+            <if test="createTime!=null">#{createTime},</if>
+            <if test="recommendFlag!=null">#{recommendFlag},</if>
+            <if test="recommendLevel!=null">#{recommendLevel},</if>
+            <if test="newsCover!=null">#{newsCover},</if>
+            <if test="origin!=null">#{origin},</if>
+            <if test="delFlag!=null">#{delFlag},</if>
+            <if test="newsTitle!=null">#{newsTitle},</if>
+            <if test="txt!=null">#{txt},</if>
+            <if test="typeId!=null">#{typeId},</if>
+            <if test="parentTypeId!=null">#{parentTypeId},</if>
+            <if test="readCount!=null">#{readCount},</if>
+        </trim>
+        )
+    </insert>
+
+    <update id="updateWalletContent" parameterType="com.ryit.commons.entity.pojo.WalletContent">
+        UPDATE wallet_content SET
+        <trim suffixOverrides=",">
+            <if test="createTime != null">create_time = #{createTime},</if>
+            <if test="recommendFlag != null">recommend_flag = #{recommendFlag},</if>
+            <if test="recommendLevel != null">recommend_level = #{recommendLevel},</if>
+            <if test="newsCover != null and newsCover!=''">news_cover = #{newsCover},</if>
+            <if test="origin != null and origin!=''">origin = #{origin},</if>
+            <if test="delFlag != null and delFlag!=''">del_flag = #{delFlag},</if>
+            <if test="newsTitle != null and newsTitle!=''">news_title = #{newsTitle},</if>
+            <if test="txt != null and txt!=''">txt = #{txt},</if>
+            <if test="typeId != null">type_id = #{typeId},</if>
+            <if test="parentTypeId != null">parent_type_id = #{parentTypeId},</if>
+            <if test="readCount != null">read_count = #{readCount},</if>
+        </trim>
+        WHERE
+        <trim suffixOverrides="and">id = #{id} and</trim>
+    </update>
+
+
+    <select id="queryById" resultMap="WalletContentMap" parameterType="java.lang.Long">
+        SELECT
+        <include refid="allResult"/>
+        FROM wallet_content WHERE del_flag = '0' AND id =#{id}
+    </select>
+
+    <update id="deleteWalletContent" parameterType="java.lang.Long">
+        UPDATE wallet_content SET del_flag = '2' WHERE id = #{id} AND del_flag = '0'
+    </update>
+
+    <select id="queryContentListByParentId" resultMap="WalletContentMap" parameterType="java.lang.Long">
+        SELECT
+        <include refid="allResult"/>
+        FROM wallet_content WHERE del_flag = '0' AND parent_type_id =#{parentTypeId} order by recommend_level DESC limit
+        8
+    </select>
+
+    <select id="queryContentListByTypeId" resultMap="WalletContentMap" parameterType="java.lang.Long">
+        SELECT
+        <include refid="allResult"/>
+        FROM wallet_content WHERE del_flag = '0' AND type_id =#{typeId} ORDER BY recommend_level DESC
+    </select>
+
+    <select id="queryByNewsTitle" resultMap="WalletContentMap" parameterType="java.lang.String">
+        SELECT
+        <include refid="allResult"/>
+        FROM wallet_content WHERE del_flag = '0' AND news_title =#{newsTitle}
+        AND (type_id = 3 AND parent_type_id = 3)
+    </select>
+
+    <select id="querySimpleContent" resultMap="WalletContentMap" parameterType="java.lang.Long">
+        SELECT
+        id,create_time,news_title,news_cover,read_count
+        FROM wallet_content WHERE del_flag = '0' AND type_id =#{typeId}
+        ORDER BY recommend_level DESC limit 8
+    </select>
+
+    <select id="queryContentsByTypeId" resultMap="WalletContentMap" parameterType="java.lang.Long">
+        SELECT
+        <include refid="allResult"/>
+        FROM wallet_content WHERE del_flag = '0' AND (parent_type_id =#{typeId} OR type_id = #{typeId}) ORDER BY
+        recommend_level DESC
+    </select>
+
+</mapper>

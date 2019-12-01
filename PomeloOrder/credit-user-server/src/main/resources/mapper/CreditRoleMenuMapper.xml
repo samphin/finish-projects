@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ryit.credituserserver.dao.CreditRoleMenuMapper">
+
+    <insert id="savaRoleMenu" parameterType="java.util.Map" >
+        insert into credit_role_menu
+        (role_id,menu_id)
+         VALUES
+        <foreach collection="menus" index="index" item="item" separator=",">
+            (#{roleId},#{item})
+        </foreach>
+    </insert>
+
+    <delete id="deleteRoleMenu" parameterType="java.lang.Long">
+         delete from credit_role_menu where role_id = #{roleId}
+    </delete>
+
+    <select id="getMenuByRoleId" parameterType="java.lang.Long"
+            resultType="com.ryit.commons.entity.pojo.CreditMenu">
+        select
+            m.menu_id  as menuId,
+            m.menu_name as menuName,
+            m.parent_id as parentId,
+            m.url,
+            m.menu_type as menuType,
+            m.visible,
+            m.perms,
+            m.icon
+        from credit_role r
+        LEFT JOIN credit_role_menu rm on rm.role_id = r.role_id
+        LEFT JOIN credit_menu m on rm.menu_id = m.menu_id
+        where r.role_id = #{roleId}
+    </select>
+
+
+</mapper>

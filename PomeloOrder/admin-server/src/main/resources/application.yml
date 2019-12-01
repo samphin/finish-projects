@@ -1,0 +1,52 @@
+server:
+  port: 8079
+spring:
+  application:
+    name: admin-server
+  main:
+    allow-bean-definition-overriding: true
+  security:
+    user:
+      name: root
+      password: root
+#  mail:
+#    host: smtp.qq.com
+#    username:
+#    password:
+#    properties:
+#      mail:
+#        smtp:
+#          auth: true
+#          starttls:
+#            enable: true
+#            required: true
+  boot:
+    admin:
+#      notify:
+#        mail:
+#          to:
+#          from:
+
+eureka:
+  instance:
+    metadata-map:
+      user.name: ${spring.security.user.name}
+      user.password: ${spring.security.user.password}
+#    eureka client发送心跳给server端的频率
+    leaseRenewalIntervalInSeconds: 10
+#    prefer-ip-address: true
+#    instance-id: ${spring.application.name}:${spring.cloud.client.ipAddress}:${server.port}
+  client:
+#    eureka client间隔多久去拉取服务注册信息
+    registryFetchIntervalSeconds: 5
+    service-url:
+      defaultZone: http://root:root@zone2:8081/eureka,http://root:root@zone1:8080/eureka
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: "*"
+  endpoint:
+    health:
+      show-details: ALWAYS

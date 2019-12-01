@@ -1,0 +1,277 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ryit.walletuserserver.dao.WalletUserMapper">
+
+    <resultMap type="com.ryit.commons.entity.vo.WalletUserVo" id="BaseResultMap">
+        <result property="id" column="id"/>
+        <result property="userName" column="user_name"/>
+        <result property="adminFlag" column="admin_flag"/>
+        <result property="phone" column="phone"/>
+        <result property="email" column="email"/>
+        <result property="avatar" column="avatar"/>
+        <result property="password" column="password"/>
+        <result property="messageFlag" column="message_flag"/>
+        <result property="sex" column="sex"/>
+        <result property="creditorIdcard" column="creditor_idcard"/>
+        <result property="realname" column="realname"/>
+        <result property="age" column="age"/>
+        <result property="releaseTime" column="release_time"/>
+        <result property="openId" column="open_id"/>
+        <result property="orderCount" column="order_count"/>
+        <result property="roleId" column="role_id"/>
+        <result property="roleName" column="role_name"/>
+        <result property="sourceCode" column="source_code"/>
+        <result property="sourceName" column="source_name"/>
+        <result property="sourceUrl" column="source_url"/>
+    </resultMap>
+
+    <resultMap type="com.ryit.commons.entity.pojo.WalletUser" id="ResultMap">
+        <result property="id" column="id"/>
+        <result property="userName" column="user_name"/>
+        <result property="adminFlag" column="admin_flag"/>
+        <result property="phone" column="phone"/>
+        <result property="email" column="email"/>
+        <result property="avatar" column="avatar"/>
+        <result property="password" column="password"/>
+        <result property="messageFlag" column="message_flag"/>
+        <result property="sex" column="sex"/>
+        <result property="creditorIdcard" column="creditor_idcard"/>
+        <result property="realname" column="realname"/>
+        <result property="age" column="age"/>
+        <result property="releaseTime" column="release_time"/>
+        <result property="openId" column="open_id"/>
+        <result property="sourceCode" column="source_code"/>
+        <result property="sourceName" column="source_name"/>
+        <result property="sourceUrl" column="source_url"/>
+    </resultMap>
+
+    <sql id="allResult">
+        <trim suffixOverrides=",">
+            id,
+            user_name,
+            admin_flag,
+            phone,
+            email,
+            avatar,
+            password,
+            message_flag,
+            sex,
+            creditor_idcard,
+            realname,
+            age,
+            release_time,
+            open_id,
+            source_code,
+            source_name,
+            source_url,
+        </trim>
+    </sql>
+
+
+    <sql id="Result">
+        <trim suffixOverrides=",">
+            id,
+            user_name,
+            (case when admin_flag = 1 then 1 else null end) as admin_flag,
+            phone,
+            avatar,
+            password,
+        </trim>
+    </sql>
+
+    <select id="getWalletUserByPhone" parameterType="java.lang.String"
+            resultType="com.ryit.commons.entity.pojo.WalletUser">
+    select
+    id, user_name AS userName, phone, password,avatar,(case when admin_flag = 1 then 1 else null end) AS adminFlag
+    from wallet_user
+    where phone = #{phone,jdbcType=VARCHAR}
+  </select>
+
+    <select id="checkPhone" parameterType="java.lang.String" resultType="java.lang.Integer">
+        select count(1) from wallet_user where phone = #{phone}
+    </select>
+
+    <!--查询订单贷款人信息-->
+    <select id="selectOrderWalletor" parameterType="long" resultMap="ResultMap">
+        SELECT
+        wu.phone,
+        wu.creditor_idcard,
+        wu.realname
+        FROM sys_order so
+        INNER JOIN wallet_user wu ON so.`wallet_user_id` = wu.`id`
+        where so.id = #{orderId}
+    </select>
+
+    <insert id="insertWalletUser" keyColumn="id" keyProperty="id"
+            parameterType="com.ryit.commons.entity.pojo.WalletUser" useGeneratedKeys="true">
+        INSERT INTO wallet_user
+        (
+        <trim suffixOverrides=",">
+            <if test="id!=null">id,</if>
+            <if test="userName!=null">user_name,</if>
+            <if test="adminFlag!=null">admin_flag,</if>
+            <if test="phone!=null">phone,</if>
+            <if test="email!=null">email,</if>
+            <if test="avatar!=null">avatar,</if>
+            <if test="password!=null">password,</if>
+            <if test="messageFlag!=null">message_flag,</if>
+            <if test="sex!=null">sex,</if>
+            <if test="creditorIdcard!=null">creditor_idcard,</if>
+            <if test="realname!=null">realname,</if>
+            <if test="age!=null">age,</if>
+            <if test="releaseTime!=null">release_time,</if>
+            <if test="openId!=null">open_id,</if>
+            <if test="sourceCode!=null">source_code,</if>
+            <if test="sourceName!=null">source_name,</if>
+            <if test="sourceUrl!=null">source_url,</if>
+        </trim>
+        )
+        VALUES
+        (
+        <trim suffixOverrides=",">
+            <if test="id!=null">#{id},</if>
+            <if test="userName!=null">#{userName},</if>
+            <if test="adminFlag!=null">#{adminFlag},</if>
+            <if test="phone!=null">#{phone},</if>
+            <if test="email!=null">#{email},</if>
+            <if test="avatar!=null">#{avatar},</if>
+            <if test="password!=null">#{password},</if>
+            <if test="messageFlag!=null">#{messageFlag},</if>
+            <if test="sex!=null">#{sex},</if>
+            <if test="creditorIdcard!=null">#{creditorIdcard},</if>
+            <if test="realname!=null">#{realname},</if>
+            <if test="age!=null">#{age},</if>
+            <if test="releaseTime!=null">#{releaseTime},</if>
+            <if test="openId!=null">#{openId},</if>
+            <if test="sourceCode!=null">#{sourceCode},</if>
+            <if test="sourceName!=null">#{sourceName},</if>
+            <if test="sourceUrl!=null">#{sourceUrl},</if>
+        </trim>
+        )
+    </insert>
+
+
+    <update id="updateWalletUser" parameterType="com.ryit.commons.entity.pojo.WalletUser">
+        UPDATE wallet_user SET
+        <trim suffixOverrides=",">
+            <if test="userName != null and userName!=''">user_name = #{userName},</if>
+            <if test="adminFlag != null">admin_flag = #{adminFlag},</if>
+            <if test="phone != null">phone = #{phone},</if>
+            <if test="email != null and email!=''">email = #{email},</if>
+            <if test="avatar != null and avatar!=''">avatar = #{avatar},</if>
+            <if test="password != null and password!=''">password = #{password},</if>
+            <if test="messageFlag != null">message_flag = #{messageFlag},</if>
+            <if test="sex != null">sex = #{sex},</if>
+            <if test="creditorIdcard != null and creditorIdcard!=''">creditor_idcard = #{creditorIdcard},</if>
+            <if test="realname != null and realname!=''">realname = #{realname},</if>
+            <if test="age != null and age!=''">age = #{age},</if>
+            <if test="openId != null and openId!=''">open_id = #{openId},</if>
+            <if test="sourceCode != null and sourceCode!=''">source_code = #{sourceCode},</if>
+            <if test="sourceName != null and sourceName!=''">source_name = #{sourceName},</if>
+            <if test="sourceUrl != null and sourceUrl!=''">source_url = #{sourceUrl},</if>
+        </trim>
+        WHERE
+        <trim suffixOverrides="and">id = #{id} and</trim>
+    </update>
+
+    <!--基于手机号修改贷款人身份证信息-->
+    <update id="updateWalletUserIdCardByPhone" parameterType="com.ryit.commons.entity.pojo.WalletUser">
+        UPDATE wallet_user SET creditor_idcard = #{creditorIdcard},realname = #{realname} WHERE phone = #{phone}
+    </update>
+
+    <select id="queryWalletUserById" parameterType="java.lang.Long" resultMap="ResultMap">
+        SELECT
+        <include refid="allResult"/>
+        FROM wallet_user WHERE id =#{id}
+    </select>
+
+
+    <update id="updatePassword">
+        UPDATE wallet_user SET password =#{password} WHERE phone =#{phone}
+    </update>
+
+    <select id="queryUserByCondition" resultMap="ResultMap"
+            parameterType="com.ryit.commons.entity.dto.WalletUserDto">
+        SELECT
+        <include refid="allResult"/>
+        FROM wallet_user
+        <trim prefix="where" suffixOverrides="and | or">
+            <if test="userName != null and userName!=''">user_name like concat('%',#{userName},'%') and</if>
+            <if test="adminFlag != null">admin_flag = #{adminFlag} and</if>
+            <if test="phone != null and phone!=''">phone like concat('%',#{phone},'%') and</if>
+            <if test="email != null and email!=''">email like concat('%',#{email},'%') and</if>
+            <if test="messageFlag != null">message_flag = #{messageFlag} and</if>
+        </trim>
+    </select>
+
+    <select id="getUserById" resultMap="BaseResultMap" parameterType="java.lang.Long">
+        SELECT
+        <include refid="allResult"/>
+        FROM wallet_user WHERE id =#{id}
+    </select>
+
+    <select id="getUserSimple" resultMap="ResultMap" parameterType="java.lang.Long">
+        SELECT
+        <include refid="Result"/>
+        FROM wallet_user WHERE id =#{id}
+    </select>
+
+    <select id="getUserInformation" resultMap="ResultMap">
+        SELECT
+        <include refid="allResult"/>
+        FROM wallet_user WHERE phone =#{phone}
+    </select>
+
+    <select id="queryUserInfo" parameterType="java.lang.Long" resultMap="BaseResultMap">
+        SELECT
+        <include refid="allResult"/>,
+        (SELECT COUNT(1) FROM sys_order WHERE wallet_user_id =#{id}) as order_count
+        FROM wallet_user WHERE id =#{id}
+    </select>
+
+    <select id="queryByIdCard" resultMap="ResultMap">
+        SELECT
+        <include refid="allResult"/>
+        FROM wallet_user WHERE creditor_idcard =#{idCard}
+    </select>
+
+    <select id="queryByOpenId" resultMap="ResultMap" parameterType="java.lang.String">
+        SELECT
+        <include refid="allResult"/>
+        FROM wallet_user WHERE open_id =#{openId}
+    </select>
+
+    <select id="queryIdCardAndName" resultMap="ResultMap" parameterType="java.lang.Long">
+        SELECT id,creditor_idcard,realname FROM wallet_user WHERE id =#{id}
+    </select>
+
+    <delete id="deleteWalletUser" parameterType="java.lang.Long">
+        DELETE FROM wallet_user WHERE admin_flag =1 AND id =#{id}
+    </delete>
+
+    <select id="queryAdminById" resultMap="BaseResultMap" parameterType="java.lang.Long">
+        SELECT
+        <include refid="allResult"/>, wur.role_id
+        FROM wallet_user wu
+        LEFT JOIN wallet_user_role wur ON wu.id = wur.user_id
+        WHERE id =#{id} AND admin_flag = 1
+    </select>
+
+    <select id="queryAdminList" resultMap="BaseResultMap" parameterType="com.ryit.commons.entity.dto.WalletUserDto">
+        SELECT
+        <include refid="allResult"/>,wr.role_id ,wr.role_name
+        FROM wallet_user
+        LEFT JOIN wallet_user_role wur ON id = wur.user_id
+        LEFT JOIN wallet_role wr ON wr.role_id = wur.role_id
+        <trim prefix="where" suffixOverrides="and | or">
+            admin_flag = 1 and
+            <if test="userName != null and userName!=''">user_name like concat('%',#{userName},'%') and</if>
+            <if test="phone != null and phone!=''">phone like concat('%',#{phone},'%') and</if>
+            <if test="email != null and email!=''">email like concat('%',#{email},'%') and</if>
+            <if test="messageFlag != null">message_flag = #{messageFlag} and</if>
+            <if test="sourceCode != null and sourceCode!=''">source_code = #{sourceCode} and</if>
+            <if test="sourceName != null and sourceName!=''">source_name = #{sourceName} and</if>
+            <if test="sourceUrl != null and sourceUrl!=''">source_url = #{sourceUrl} and</if>
+        </trim>
+    </select>
+</mapper>

@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.ryit.credithelpserver.dao.CreditHelpMapper" >
+  <resultMap id="BaseResultMap" type="com.ryit.commons.entity.pojo.CreditHelp" >
+    <result column="id" property="id" jdbcType="INTEGER" />
+    <result column="ask" property="ask" jdbcType="VARCHAR" />
+    <result column="sort" property="sort" jdbcType="INTEGER" />
+    <result column="answer" property="answer" jdbcType="VARCHAR" />
+  </resultMap>
+
+  <!--查询所有问答信息-->
+  <select id="selectAllByCondition" parameterType="com.ryit.commons.entity.pojo.CreditHelp" resultMap="BaseResultMap">
+    select id,ask,sort,answer from credit_help
+    <where>
+        <if test="ask != null ">
+          ask like concat('%',#{ask},'%')
+        </if>
+        <if test="answer != null ">
+          answer like concat('%',#{answer},'%')
+        </if>
+    </where>
+    order by sort
+  </select>
+
+  <insert id="insert" parameterType="com.ryit.commons.entity.pojo.CreditHelp" >
+    INSERT INTO credit_help(sort,ask,answer)
+    values (#{sort,jdbcType=INTEGER},#{ask,jdbcType=VARCHAR},#{answer,jdbcType=VARCHAR})
+  </insert>
+
+  <update id="updateByPrimaryKey" parameterType="com.ryit.commons.entity.pojo.CreditHelp" >
+    update credit_help
+    set ask = #{ask,jdbcType=VARCHAR},
+    answer = #{answer,jdbcType=VARCHAR},
+    sort = #{sort,jdbcType=INTEGER}
+    where id = #{id}
+  </update>
+
+  <delete id="deleteByPrimaryKey" parameterType="long">
+    delete from credit_help where id = #{id}
+  </delete>
+
+  <delete id="deleteBatch" parameterType="list">
+    delete from credit_help where id in
+    <foreach collection="list" item="item" index="index" open="(" separator="," close=")">
+      #{item}
+    </foreach>
+  </delete>
+
+  <select id="selectByPrimaryKey" parameterType="long" resultMap="BaseResultMap">
+    select id ,ask,sort,answer from credit_help where id = #{id}
+  </select>
+
+</mapper>

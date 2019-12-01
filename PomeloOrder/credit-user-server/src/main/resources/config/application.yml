@@ -1,0 +1,9 @@
+server:
+  port: 8090
+eureka:
+  client:
+    service-url:
+      defaultZone: http://root:root@zone2:8081/eureka,http://root:root@zone1:8080/eureka
+spring:
+  application:
+    name: credit-user-server

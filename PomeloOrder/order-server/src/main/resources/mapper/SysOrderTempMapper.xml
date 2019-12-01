@@ -1,0 +1,331 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ryit.orderserver.dao.SysOrderTempMapper">
+    <resultMap id="BaseResultMap" type="com.ryit.commons.entity.pojo.SysOrderTemp">
+        <id column="id" jdbcType="BIGINT" property="id" />
+        <result column="order_money" jdbcType="DOUBLE" property="orderMoney" />
+        <result column="order_term" jdbcType="VARCHAR" property="orderTerm" />
+        <result column="order_coin" jdbcType="DOUBLE" property="orderCoin" />
+        <result column="order_reason" jdbcType="VARCHAR" property="orderReason" />
+        <result column="order_remark" jdbcType="VARCHAR" property="orderRemark" />
+        <result column="wallet_user_id" jdbcType="BIGINT" property="walletUserId" />
+        <result column="edu_level" jdbcType="VARCHAR" property="eduLevel" />
+        <result column="marital_status" jdbcType="VARCHAR" property="maritalStatus" />
+        <result column="careers_type" jdbcType="VARCHAR" property="careersType" />
+        <result column="company_type" jdbcType="VARCHAR" property="companyType" />
+        <result column="month_cash" jdbcType="VARCHAR" property="monthCash" />
+        <result column="wages_way" jdbcType="VARCHAR" property="wagesWay" />
+        <result column="work_age" jdbcType="VARCHAR" property="workAge" />
+        <result column="city" jdbcType="INTEGER" property="city" />
+        <result column="company_name" jdbcType="VARCHAR" property="companyName" />
+        <result column="manager_flow" jdbcType="VARCHAR" property="managerFlow" />
+        <result column="manager_year" jdbcType="VARCHAR" property="managerYear" />
+        <result column="business_license" jdbcType="VARCHAR" property="businessLicense" />
+        <result column="source" jdbcType="INTEGER" property="source" />
+        <result column="create_user_id" jdbcType="BIGINT" property="createUserId" />
+        <result column="create_time" jdbcType="TIMESTAMP" property="createTime" />
+    </resultMap>
+
+    <resultMap id="SysOrderTempDetailResultMap" type="com.ryit.commons.entity.pojo.SysOrderTemp" extends="BaseResultMap">
+        <collection property="aptitudes"
+                    ofType="com.ryit.commons.entity.pojo.SysOrderAptitudeTemp"
+                    column="id"
+                    select="com.ryit.orderserver.dao.SysOrderAptitudeTempMapper.selectAllByOrderId">
+        </collection>
+    </resultMap>
+
+    <sql id="Base_Column_List">
+        id, order_money, order_term, order_coin, order_reason, order_remark, wallet_user_id,
+        edu_level, marital_status, careers_type, company_type, month_cash, wages_way, work_age,
+        city, company_name, manager_flow, manager_year, business_license, `source`,create_user_id,create_time
+    </sql>
+
+    <select id="selectOrderTempDetail" parameterType="map"
+            resultType="com.ryit.commons.entity.vo.SysOrderTempDetailVo">
+        select
+            sot.id,
+            sot.order_money as orderMoney,
+            sot.order_term as orderTerm,
+            sot.order_coin as orderCoin,
+            sot.order_reason as orderReason,
+            sot.order_remark as orderRemark,
+            sot.edu_level as eduLevel,
+            sot.marital_status as maritalStatus,
+            sot.careers_type as careersType,
+            sot.company_type as companyType,
+            sot.month_cash as monthCash,
+            sot.wages_way as wagesWay,
+            sot.work_age as workAge,
+            sot.city,
+            sa.parent_code as parentCity,
+            sot.company_name as companyName,
+            sot.manager_flow as managerFlow,
+            sot.manager_year as managerYear,
+            sot.business_license as businessLicense,
+            sot.`source`,
+            cu.user_name as createUserName,
+            sot.create_time as createTime,
+            sot.wallet_user_id as walletUserId,
+            wu.realname,
+            wu.phone
+            from sys_order_temp sot
+            left join credit_user cu on sot.create_user_id = cu.id
+            left join wallet_user wu on sot.wallet_user_id = wu.id
+            inner join sys_area sa on sot.city = sa.code
+            <where>
+                <if test="id != null">
+                    sot.id = #{id,jdbcType=BIGINT}
+                </if>
+                <if test="phone != null ">
+                    wu.phone = #{phone,jdbcType=VARCHAR}
+                </if>
+            </where>
+    </select>
+
+    <select id="selectAllDraftsList"
+            parameterType="com.ryit.commons.entity.dto.SysOrderTempQueryDto"
+            resultType="com.ryit.commons.entity.vo.SysOrderTempListVo">
+        select
+        sot.id,
+        sot.order_money as orderMoney,
+        sot.order_term as orderTerm,
+        sot.order_coin as orderCoin,
+        sot.order_reason as orderReason,
+        sot.order_remark as orderRemark,
+        sot.edu_level as eduLevel,
+        sot.marital_status as maritalStatus,
+        sot.careers_type as careersType,
+        sot.company_type as companyType,
+        sot.month_cash as monthCash,
+        sot.wages_way as wagesWay,
+        sot.work_age as workAge,
+        sot.city,
+        sot.company_name as companyName,
+        sot.manager_flow as managerFlow,
+        sot.manager_year as managerYear,
+        sot.business_license as businessLicense,
+        sot.`source`,
+        cu.user_name as createUserName,
+        sot.create_time as createTime,
+        wu.realname,
+        wu.phone
+        from sys_order_temp sot
+        left join credit_user cu on sot.create_user_id = cu.id
+        left join wallet_user wu on sot.wallet_user_id = wu.id
+        <where>
+            <if test="source != null">
+                sot.source = #{source,jdbcType=INTEGER}
+            </if>
+            <if test="city != null">
+                and sot.city = #{city,jdbcType=INTEGER}
+            </if>
+            <if test="realname != null and realname != ''">
+                and wu.realname like concat('%',#{realname,jdbcType=VARCHAR},'%')
+            </if>
+            <if test="phone != null and phone != ''">
+                and wu.phone like concat('%',#{phone,jdbcType=VARCHAR},'%')
+            </if>
+        </where>
+        order by sot.create_time desc
+    </select>
+
+    <delete id="deleteByPrimaryKey" parameterType="java.lang.Long">
+        delete from sys_order_temp where id = #{id,jdbcType=BIGINT}
+    </delete>
+
+    <!--保存草稿箱-->
+    <insert id="insertSelective" keyColumn="id" keyProperty="id" parameterType="com.ryit.commons.entity.pojo.SysOrderTemp" useGeneratedKeys="true">
+        insert into sys_order_temp
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="orderMoney != null">
+                order_money,
+            </if>
+            <if test="orderTerm != null">
+                order_term,
+            </if>
+            <if test="orderCoin != null">
+                order_coin,
+            </if>
+            <if test="orderReason != null">
+                order_reason,
+            </if>
+            <if test="orderRemark != null">
+                order_remark,
+            </if>
+            <if test="walletUserId != null">
+                wallet_user_id,
+            </if>
+            <if test="eduLevel != null">
+                edu_level,
+            </if>
+            <if test="maritalStatus != null">
+                marital_status,
+            </if>
+            <if test="careersType != null">
+                careers_type,
+            </if>
+            <if test="companyType != null">
+                company_type,
+            </if>
+            <if test="monthCash != null">
+                month_cash,
+            </if>
+            <if test="wagesWay != null">
+                wages_way,
+            </if>
+            <if test="workAge != null">
+                work_age,
+            </if>
+            <if test="city != null">
+                city,
+            </if>
+            <if test="companyName != null">
+                company_name,
+            </if>
+            <if test="managerFlow != null">
+                manager_flow,
+            </if>
+            <if test="managerYear != null">
+                manager_year,
+            </if>
+            <if test="businessLicense != null">
+                business_license,
+            </if>
+            <if test="source != null">
+                `source`,
+            </if>
+            <if test="createUserId != null">
+                create_user_id,
+            </if>
+            create_time
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="orderMoney != null">
+                #{orderMoney,jdbcType=DOUBLE},
+            </if>
+            <if test="orderTerm != null">
+                #{orderTerm,jdbcType=VARCHAR},
+            </if>
+            <if test="orderCoin != null">
+                #{orderCoin,jdbcType=DOUBLE},
+            </if>
+            <if test="orderReason != null">
+                #{orderReason,jdbcType=VARCHAR},
+            </if>
+            <if test="orderRemark != null">
+                #{orderRemark,jdbcType=VARCHAR},
+            </if>
+            <if test="walletUserId != null">
+                #{walletUserId,jdbcType=INTEGER},
+            </if>
+            <if test="eduLevel != null">
+                #{eduLevel,jdbcType=VARCHAR},
+            </if>
+            <if test="maritalStatus != null">
+                #{maritalStatus,jdbcType=VARCHAR},
+            </if>
+            <if test="careersType != null">
+                #{careersType,jdbcType=VARCHAR},
+            </if>
+            <if test="companyType != null">
+                #{companyType,jdbcType=VARCHAR},
+            </if>
+            <if test="monthCash != null">
+                #{monthCash,jdbcType=VARCHAR},
+            </if>
+            <if test="wagesWay != null">
+                #{wagesWay,jdbcType=VARCHAR},
+            </if>
+            <if test="workAge != null">
+                #{workAge,jdbcType=VARCHAR},
+            </if>
+            <if test="city != null">
+                #{city,jdbcType=INTEGER},
+            </if>
+            <if test="companyName != null">
+                #{companyName,jdbcType=VARCHAR},
+            </if>
+            <if test="managerFlow != null">
+                #{managerFlow,jdbcType=VARCHAR},
+            </if>
+            <if test="managerYear != null">
+                #{managerYear,jdbcType=VARCHAR},
+            </if>
+            <if test="businessLicense != null">
+                #{businessLicense,jdbcType=VARCHAR},
+            </if>
+            <if test="source != null">
+                #{source,jdbcType=INTEGER},
+            </if>
+            <if test="createUserId != null">
+                #{createUserId,jdbcType=BIGINT},
+            </if>
+            SYSDATE()
+        </trim>
+    </insert>
+
+    <!--修改订单草稿箱-->
+    <update id="updateByPrimaryKeySelective" parameterType="com.ryit.commons.entity.pojo.SysOrderTemp">
+        update sys_order_temp
+        <set>
+            <if test="orderMoney != null">
+                order_money = #{orderMoney,jdbcType=DOUBLE},
+            </if>
+            <if test="orderTerm != null">
+                order_term = #{orderTerm,jdbcType=VARCHAR},
+            </if>
+            <if test="orderCoin != null">
+                order_coin = #{orderCoin,jdbcType=DOUBLE},
+            </if>
+            <if test="orderReason != null">
+                order_reason = #{orderReason,jdbcType=VARCHAR},
+            </if>
+            <if test="orderRemark != null">
+                order_remark = #{orderRemark,jdbcType=VARCHAR},
+            </if>
+            <if test="walletUserId != null">
+                wallet_user_id = #{walletUserId,jdbcType=INTEGER},
+            </if>
+            <if test="eduLevel != null">
+                edu_level = #{eduLevel,jdbcType=VARCHAR},
+            </if>
+            <if test="maritalStatus != null">
+                marital_status = #{maritalStatus,jdbcType=VARCHAR},
+            </if>
+            <if test="careersType != null">
+                careers_type = #{careersType,jdbcType=VARCHAR},
+            </if>
+            <if test="companyType != null">
+                company_type = #{companyType,jdbcType=VARCHAR},
+            </if>
+            <if test="monthCash != null">
+                month_cash = #{monthCash,jdbcType=VARCHAR},
+            </if>
+            <if test="wagesWay != null">
+                wages_way = #{wagesWay,jdbcType=VARCHAR},
+            </if>
+            <if test="workAge != null">
+                work_age = #{workAge,jdbcType=VARCHAR},
+            </if>
+            <if test="city != null">
+                city = #{city,jdbcType=INTEGER},
+            </if>
+            <if test="companyName != null">
+                company_name = #{companyName,jdbcType=VARCHAR},
+            </if>
+            <if test="managerFlow != null">
+                manager_flow = #{managerFlow,jdbcType=VARCHAR},
+            </if>
+            <if test="managerYear != null">
+                manager_year = #{managerYear,jdbcType=VARCHAR},
+            </if>
+            <if test="businessLicense != null">
+                business_license = #{businessLicense,jdbcType=VARCHAR},
+            </if>
+            <if test="source != null">
+                `source` = #{source,jdbcType=INTEGER},
+            </if>
+        </set>
+        where id = #{id,jdbcType=BIGINT}
+    </update>
+</mapper>

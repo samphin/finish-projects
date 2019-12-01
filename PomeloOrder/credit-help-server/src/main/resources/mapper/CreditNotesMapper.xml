@@ -1,0 +1,153 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.ryit.credithelpserver.dao.CreditNotesMapper" >
+  <resultMap id="BaseResultMap" type="com.ryit.commons.entity.pojo.CreditNotes">
+    <id column="id" jdbcType="INTEGER" property="id" />
+    <result column="note" jdbcType="VARCHAR" property="note" />
+    <result column="phone" jdbcType="VARCHAR" property="phone" />
+    <result column="email" jdbcType="VARCHAR" property="email" />
+    <result column="answer_content" jdbcType="VARCHAR" property="answerContent" />
+    <result column="answer_user_id" jdbcType="BIGINT" property="answerUserId" />
+    <result column="create_time" jdbcType="TIMESTAMP" property="createTime" />
+    <result column="answer_time" jdbcType="TIMESTAMP" property="answerTime" />
+    <result column="answer_status" jdbcType="BOOLEAN" property="answerStatus" />
+  </resultMap>
+  <sql id="Base_Column_List">
+    id, note, phone, email,create_time, answer_content, answer_user_id, answer_time, answer_status
+  </sql>
+
+  <resultMap id="DetailResultMap" type="com.ryit.commons.entity.pojo.CreditNotes" extends="BaseResultMap">
+    <collection property="images" ofType="com.ryit.commons.entity.pojo.CreditNotesImg"
+                column="id"
+                select="com.ryit.credithelpserver.dao.CreditNotesImgMapper.selectImageByNotesId"/>
+  </resultMap>
+
+  <!--保存留言并返回自动增长主键值-->
+  <insert id="insertSelective" keyColumn="id" keyProperty="id" parameterType="com.ryit.commons.entity.pojo.CreditNotes" useGeneratedKeys="true">
+    insert into credit_notes
+    <trim prefix="(" suffix=")" suffixOverrides=",">
+      <if test="note != null">
+        note,
+      </if>
+      <if test="phone != null">
+        phone,
+      </if>
+      <if test="email != null">
+        email,
+      </if>
+      create_time,
+      <if test="answerContent != null">
+        answer_content,
+      </if>
+      <if test="answerUserId != null">
+        answer_user_id,
+      </if>
+      <if test="answerTime != null">
+        answer_time,
+      </if>
+      <if test="answerStatus != null">
+        answer_status,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides=",">
+      <if test="note != null">
+        #{note,jdbcType=VARCHAR},
+      </if>
+      <if test="phone != null">
+        #{phone,jdbcType=VARCHAR},
+      </if>
+      <if test="email != null">
+        #{email,jdbcType=VARCHAR},
+      </if>
+      SYSDATE(),
+      <if test="answerContent != null">
+        #{answerContent,jdbcType=VARCHAR},
+      </if>
+      <if test="answerUserId != null">
+        #{answerUserId,jdbcType=BIGINT},
+      </if>
+      <if test="answerTime != null">
+        #{answerTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="answerStatus != null">
+        #{answerStatus,jdbcType=BOOLEAN},
+      </if>
+    </trim>
+  </insert>
+
+  <update id="updateByPrimaryKeySelective" parameterType="com.ryit.commons.entity.pojo.CreditNotes" >
+    update credit_notes
+    <set>
+      <if test="note != null">
+        note = #{note,jdbcType=VARCHAR},
+      </if>
+      <if test="phone != null">
+        phone = #{phone,jdbcType=VARCHAR},
+      </if>
+      <if test="email != null">
+        email = #{email,jdbcType=VARCHAR},
+      </if>
+      <if test="answerContent != null">
+        answer_content = #{answerContent,jdbcType=VARCHAR},
+      </if>
+      <if test="answerUserId != null">
+        answer_user_id = #{answerUserId,jdbcType=BIGINT},
+      </if>
+      <if test="answerTime != null">
+        answer_time = #{answerTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="answerStatus != null">
+        answer_status = #{answerStatus,jdbcType=BOOLEAN},
+      </if>
+    </set>
+    where id = #{id,jdbcType=INTEGER}
+  </update>
+
+  <delete id="deleteByPrimaryKey" parameterType="long">
+    delete from credit_notes where id = #{id}
+  </delete>
+
+  <delete id="deleteBatch" parameterType="list">
+    delete from credit_notes where id in
+    <foreach collection="list" item="item" index="index" open="(" separator="," close=")">
+      #{item}
+    </foreach>
+  </delete>
+
+  <select id="selectAllByCondition" parameterType="com.ryit.commons.entity.pojo.CreditNotes" resultType="com.ryit.commons.entity.pojo.CreditNotes">
+    select
+    cn.id,
+    cn.note,
+    cn.phone,
+    cn.email,
+    cn.create_time as createTime,
+    cn.answer_content as answerContent,
+    cu.user_name as answerUserName,
+    cn.answer_time as answerTime,
+    cn.answer_status as answerStatus
+    from credit_notes cn
+    left join credit_user cu on cn.answer_user_id = cu.id
+    <where>
+      <if test="note != null and note != ''">
+        and cn.note like concat('%',#{note},'%')
+      </if>
+      <if test="phone != null">
+        and cn.phone like concat('%',#{phone},'%')
+      </if>
+      <if test="email != null">
+        and cn.email like concat('%',#{email},'%')
+      </if>
+      <if test="answerStatus != null ">
+        and cn.answer_status = #{answerStatus}
+      </if>
+      <if test="answerContent != null and answerContent != ''">
+        and cn.answer_Content like concat('%',#{answerContent},'%')
+      </if>
+    </where>
+    order by cn.create_time desc
+  </select>
+
+  <select id="selectByPrimaryKey" parameterType="long" resultMap="DetailResultMap">
+    select <include refid="Base_Column_List"/> from credit_notes where id = #{id}
+  </select>
+</mapper>

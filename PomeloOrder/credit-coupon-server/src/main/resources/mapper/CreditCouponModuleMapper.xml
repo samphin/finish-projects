@@ -1,0 +1,106 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.ryit.creditcouponserver.dao.CreditCouponModuleMapper">
+    <resultMap id="BaseResultMap" type="com.ryit.commons.entity.pojo.CreditCouponModule">
+        <result column="id" property="id" jdbcType="INTEGER"/>
+        <result column="name" property="name" jdbcType="VARCHAR"/>
+        <result column="discount_coin" property="discountCoin" jdbcType="DOUBLE"/>
+        <result column="coin" property="coin" jdbcType="DOUBLE"/>
+        <result column="type" property="type" jdbcType="INTEGER"/>
+        <result column="valid_start_time" property="validStartTime" jdbcType="TIMESTAMP"/>
+        <result column="valid_end_time" property="validEndTime" jdbcType="TIMESTAMP"/>
+    </resultMap>
+
+    <select id="selectCouponModuleById" parameterType="long" resultMap="BaseResultMap">
+        select name,discount_coin,coin,type,valid_start_time,valid_end_time from credit_coupon_module where id =
+        #{moduleId}
+    </select>
+
+    <!--查询用户未使用且未过期的优惠券-->
+    <select id="selectNoUseCoupon" parameterType="map" resultMap="BaseResultMap">
+        SELECT t1.id,t2.name,t2.type,t2.coin,t2.discount_coin,t1.valid_start_time,t1.valid_end_time FROM credit_coupon
+        t1
+        LEFT JOIN credit_coupon_module t2 ON t1.module_id = t2.id
+        WHERE t1.use_status = 0 AND t1.user_id = #{userId} AND SYSDATE() BETWEEN t1.valid_start_time AND
+        t1.valid_end_time
+        <if test="coin != null ">
+            and t2.coin &lt;= #{coin,jdbcType=DOUBLE}
+        </if>
+    </select>
+
+    <!--查询用户已过期的优惠券-->
+    <select id="selectPastDueCoupon" parameterType="long" resultMap="BaseResultMap">
+        SELECT t2.name,t2.type,t2.coin,t2.discount_coin,t1.valid_start_time,t1.valid_end_time FROM credit_coupon t1
+        LEFT JOIN credit_coupon_module t2 ON t1.module_id = t2.id
+        WHERE t1.user_id = #{userId} AND SYSDATE() &gt; t1.valid_end_time
+    </select>
+
+    <!--查询优惠券优惠金额-->
+    <select id="selectDiscountCoin" parameterType="long" resultMap="BaseResultMap">
+        SELECT t2.discount_coin,t2.type FROM credit_coupon t1
+        LEFT JOIN credit_coupon_module t2 ON t1.module_id = t2.id
+        WHERE t1.id = #{relationId}
+    </select>
+
+    <insert id="insert" parameterType="com.ryit.commons.entity.pojo.CreditCouponModule">
+        insert into credit_coupon_module (`name`, discount_coin,
+        coin, `type`, valid_start_time,
+        valid_end_time)
+        values (#{name,jdbcType=VARCHAR}, #{discountCoin,jdbcType=DOUBLE},
+        #{coin,jdbcType=DOUBLE}, #{type,jdbcType=INTEGER}, #{validStartTime,jdbcType=TIMESTAMP},
+        #{validEndTime,jdbcType=TIMESTAMP})
+    </insert>
+
+    <update id="updateByPrimaryKey" parameterType="com.ryit.commons.entity.pojo.CreditCouponModule">
+        update credit_coupon_module
+        set
+        `name` = #{name,jdbcType=VARCHAR},
+        discount_coin = #{discountCoin,jdbcType=DOUBLE},
+        coin = #{coin,jdbcType=DOUBLE},
+        `type` = #{type,jdbcType=INTEGER},
+        valid_start_time = #{validStartTime,jdbcType=TIMESTAMP},
+        valid_end_time = #{validEndTime,jdbcType=TIMESTAMP}
+        where id = #{id}
+    </update>
+
+    <delete id="deleteByPrimaryKey" parameterType="long">
+        delete from credit_coupon_module where id = #{id}
+    </delete>
+
+    <delete id="deleteBatch" parameterType="list">
+        delete from credit_coupon_module where id in
+        <foreach collection="list" item="item" index="index" open="(" separator="," close=")">
+            #{item}
+        </foreach>
+    </delete>
+
+    <!--查询优惠券模版是否被领取-->
+    <select id="selectCouponCrawRecord" parameterType="long" resultType="integer">
+        SELECT COUNT(id) FROM credit_coupon_module t1
+        WHERE EXISTS(SELECT module_id FROM credit_coupon t2 WHERE t1.id = t2.`module_id`) AND t1.id = #{id}
+    </select>
+
+    <select id="selectAllByCondition" parameterType="com.ryit.commons.entity.pojo.CreditCouponModule"
+            resultMap="BaseResultMap">
+        SELECT id ,name, discount_coin,coin, type, valid_start_time,valid_end_time FROM credit_coupon_module
+        <where>
+            id != 0
+            <if test="type != null">
+                and type = #{type}
+            </if>
+            <if test="name!= null">
+                and name like concat('%',#{name},'%')
+            </if>
+            <if test="validStartTime != null and validEndTime != null">
+                AND SYSDATE() BETWEEN valid_start_time and valid_end_time
+            </if>
+        </where>
+        order by valid_end_time desc
+    </select>
+
+    <select id="selectByPrimaryKey" parameterType="long" resultMap="BaseResultMap">
+        SELECT id ,`name`, discount_coin,
+        coin, `type`, valid_start_time,
+        valid_end_time FROM credit_coupon_module where id = #{id}
+    </select>
+</mapper>

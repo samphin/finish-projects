@@ -1,0 +1,138 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ryit.walletnewsserver.dao.WalletNewsMapper">
+
+
+    <sql id="allResult">
+        <trim suffixOverrides=",">
+            id,
+            news_title,
+            title_img,
+            recommend_flag+0 as recommend_flag,
+            recommend_level,
+            read_count,
+            release_time,
+            origin,
+            del_flag+0 as del_flag,
+        </trim>
+    </sql>
+
+    <resultMap type="com.ryit.commons.entity.vo.WalletNewsVo" id="BaseResultMap">
+        <result property="id" column="id"/>
+        <result property="newsTitle" column="news_title"/>
+        <result property="titleImg" column="title_img"/>
+        <result property="recommendFlag" column="recommend_flag"/>
+        <result property="recommendLevel" column="recommend_level"/>
+        <result property="readCount" column="read_count"/>
+        <result property="releaseTime" column="release_time"/>
+        <result property="origin" column="origin"/>
+        <result property="delFlag" column="del_flag"/>
+        <result property="txt" column="txt"/>
+    </resultMap>
+
+
+    <insert id="insertWalletNews" useGeneratedKeys="true" parameterType="com.ryit.commons.entity.pojo.WalletNews"
+            keyProperty="id">
+        INSERT INTO wallet_news
+        (
+        <trim suffixOverrides=",">
+            <if test="id != null">id,</if>
+            <if test="newsTitle != null">news_title,</if>
+            <if test="titleImg != null">title_img,</if>
+            <if test="recommendFlag != null">recommend_flag,</if>
+            <if test="recommendLevel != null">recommend_level,</if>
+            <if test="readCount != null">read_count,</if>
+            <if test="releaseTime != null">release_time,</if>
+            <if test="origin != null">origin,</if>
+            <if test="delFlag != null">del_flag,</if>
+            <if test="txt != null">txt,</if>
+        </trim>
+        )
+        VALUES
+        (
+        <trim suffixOverrides=",">
+            <if test="id != null">#{id},</if>
+            <if test="newsTitle != null">#{newsTitle},</if>
+            <if test="titleImg != null">#{titleImg},</if>
+            <if test="recommendFlag != null">#{recommendFlag},</if>
+            <if test="recommendLevel != null">#{recommendLevel},</if>
+            <if test="readCount != null">#{readCount},</if>
+            <if test="releaseTime != null">#{releaseTime},</if>
+            <if test="origin != null">#{origin},</if>
+            <if test="delFlag != null">#{delFlag},</if>
+            <if test="txt != null">#{txt},</if>
+        </trim>
+        )
+    </insert>
+
+    <update id="deleteWalletNews" parameterType="java.lang.Long">
+        UPDATE wallet_news SET del_flag ="1" WHERE del_flag = 0 AND id IN
+        <foreach collection="ids" index="index" item="item" open="(" separator="," close=")">
+            #{item}
+        </foreach>
+    </update>
+
+    <select id="queryNewsById" resultMap="BaseResultMap" parameterType="java.lang.Long">
+        SELECT
+        <include refid="allResult"/>,txt
+        FROM wallet_news WHERE id =#{id} and del_flag =0
+    </select>
+
+    <select id="queryNewsByCondition" resultMap="BaseResultMap"
+            parameterType="com.ryit.commons.entity.dto.WalletNewsDto">
+        SELECT
+        <include refid="allResult"/>
+        FROM wallet_news
+        <where>
+            del_flag = 0
+            <if test="startTime != null">
+                AND release_time >=#{startTime}
+            </if>
+            <if test="endTime != null">
+                AND release_time &lt;=#{endTime}
+            </if>
+            <if test="newsTitle != null and newsTitle != ''">
+                AND news_title like CONCAT(CONCAT('%', #{newsTitle,jdbcType=VARCHAR}), '%')
+            </if>
+        </where>
+    </select>
+
+    <update id="updateWalletNews" parameterType="com.ryit.commons.entity.pojo.WalletNews">
+        UPDATE wallet_news SET
+        <trim suffixOverrides=",">
+            <if test="newsTitle != null and newsTitle!=''">news_title = #{newsTitle},</if>
+            <if test="titleImg != null and titleImg!=''">title_img = #{titleImg},</if>
+            <if test="recommendFlag != null">recommend_flag = #{recommendFlag},</if>
+            <if test="recommendLevel != null">recommend_level = #{recommendLevel},</if>
+            <if test="readCount != null">read_count = #{readCount},</if>
+            <if test="releaseTime != null">release_time = #{releaseTime},</if>
+            <if test="origin != null and origin!=''">origin = #{origin},</if>
+            <if test="delFlag != null">del_flag = #{delFlag},</if>
+            <if test="txt != null and txt!=''">txt = #{txt},</if>
+        </trim>
+        WHERE
+        <trim suffixOverrides="and">id = #{id} and</trim>
+    </update>
+
+    <select id="getRecommendNews" resultMap="BaseResultMap">
+        SELECT
+        id,news_title,read_count,release_time,title_img,origin
+        FROM wallet_news WHERE recommend_flag =0 ORDER BY recommend_level DESC
+    </select>
+
+    <select id="getNewsBanner" resultMap="BaseResultMap">
+        SELECT
+        id,news_title,title_img,read_count,release_time
+        FROM wallet_news WHERE recommend_flag =0 AND del_flag = 0
+        AND title_img IS NOT NULL
+        ORDER BY recommend_level DESC limit 8
+    </select>
+
+    <select id="getRecommendNewsTitle" resultType="java.lang.String" parameterType="java.util.Set">
+        SELECT news_title FROM wallet_news WHERE id IN
+        <foreach collection="set" index="index" item="item" open="(" separator="," close=")">
+            #{item}
+        </foreach>
+    </select>
+
+</mapper>

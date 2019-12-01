@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.ryit.orderserver.dao.SysOrderBackimgMapper">
+    <resultMap id="BaseResultMap" type="com.ryit.commons.entity.pojo.SysOrderBackimg">
+        <result column="id" property="id" jdbcType="INTEGER"/>
+        <result column="order_id" property="orderId" jdbcType="INTEGER"/>
+        <result column="retuen_img_path" property="retuenImgPath" jdbcType="VARCHAR"/>
+    </resultMap>
+
+    <!--查询退单订单审核图片-->
+    <select id="selectOrderBackImage" parameterType="long" resultMap="BaseResultMap">
+        select order_id,retuen_img_path from sys_order_backimg where order_id = #{orderId}
+    </select>
+</mapper>

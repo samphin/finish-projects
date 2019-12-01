@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.ryit.creditcouponserver.dao.CreditCouponMapper" >
+  <resultMap id="BaseResultMap" type="com.ryit.commons.entity.pojo.CreditCoupon" >
+    <result column="id" property="id" jdbcType="INTEGER" />
+    <result column="module_id" property="moduleId" jdbcType="INTEGER" />
+    <result column="user_id" property="userId" jdbcType="INTEGER" />
+    <result column="use_status" property="useStatus" jdbcType="INTEGER" />
+    <result column="valid_start_time" property="validStartTime" jdbcType="TIMESTAMP" />
+    <result column="valid_end_time" property="validEndTime" jdbcType="TIMESTAMP" />
+  </resultMap>
+
+  <!--领取优惠券 -->
+  <insert id="insertBatch" parameterType="list" >
+    insert into credit_coupon (module_id, user_id,use_status,valid_start_time,valid_end_time) values
+    <foreach collection="list" item="item" separator="," index="index">
+      (
+        #{item.moduleId,jdbcType=INTEGER},
+        #{item.userId,jdbcType=INTEGER},
+        #{item.useStatus,jdbcType=INTEGER},
+        #{item.validStartTime,jdbcType=TIMESTAMP},
+        #{item.validEndTime,jdbcType=TIMESTAMP}
+      )
+    </foreach>
+  </insert>
+
+  <!--根据主键ID，将当前绑定优惠券状态改为已使用-->
+  <update id="updateCouponUseStatus" parameterType="long">
+    update credit_coupon set use_status = 1 where id = #{relationId}
+  </update>
+
+  <!--根据查询条件筛选优惠券使用情况-->
+  <select id="selectCouponList" parameterType="map" resultType="com.ryit.commons.entity.pojo.CreditCouponList">
+    SELECT
+    t1.module_id as moduleId,
+    t3.name as moduleName,
+    t1.user_id as userId,
+    t2.user_name as userName,
+    t1.use_status as useStatus,
+    t1.valid_start_time as validStartTime,
+    t1.valid_end_time as validEndTime
+    FROM credit_coupon t1
+    LEFT JOIN credit_user t2 ON t1.user_id = t2.id
+    LEFT JOIN credit_coupon_module t3 ON t1.module_id = t3.id
+    <where>
+      <if test="userName != null">
+        and t2.user_name like concat('%',#{userName},'%')
+      </if>
+      <if test="moduleName != null">
+        and t3.name like concat('%',#{moduleName},'%')
+      </if>
+      <if test="useStatus != null">
+        and t1.use_status = #{useStatus}
+      </if>
+    </where>
+    order by validStartTime desc
+  </select>
+
+</mapper>

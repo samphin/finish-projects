@@ -1,0 +1,197 @@
+#product environment
+server-ip: 172.18.104.237
+redis-ip: 172.18.104.237
+redis-password: i-wz98o9
+manager-server: 172.18.104.237
+datasource-username: credituser
+datasource-password: credituser
+
+#dev environment
+#server-ip: 192.168.0.84
+#redis-ip: 192.168.0.161
+#redis-password: foobared
+#manager-server: 192.168.0.161
+#datasource-username: root
+#datasource-password: wang+123yi
+
+spring:
+  #redis配置
+  redis:
+    host: ${redis-ip}
+    password: ${redis-password}
+    port: 6379
+    timeOut: 86400
+    database: 0
+    pool:
+      # 连接池最大连接数（使用负值表示没有限制）
+      max-active: -1
+      # 连接池最大阻塞等待时间（使用负值表示没有限制）
+      max-wait: -1
+      # 连接池中的最大空闲连接
+#      max-idle: 8
+      # 连接池中的最小空闲连接
+      min-idle: 0
+  #数据库配置
+  datasource:
+    type: com.alibaba.druid.pool.DruidDataSource
+    druid:
+      driverClassName: com.mysql.cj.jdbc.Driver
+      url: jdbc:mysql://${server-ip}:3306/expressloan?useUnicode=true&characterEncoding=utf8&zeroDateTimeBehavior=convertToNull&useSSL=true&serverTimezone=GMT%2B8
+      username: ${datasource-username}
+      password: ${datasource-password}
+      # 初始连接数
+      initial-size: 10
+      # 最大连接池数量
+      max-active: 100
+      # 最小连接池数量
+      min-idle: 10
+      # 配置获取连接等待超时的时间
+      max-wait: 60000
+      # 打开PSCache，并且指定每个连接上PSCache的大小
+      pool-prepared-statements: true
+      max-pool-prepared-statement-per-connection-size: 20
+      # 配置间隔多久才进行一次检测，检测需要关闭的空闲连接，单位是毫秒
+      timeBetweenEvictionRunsMillis: 60000
+      # 配置一个连接在池中最小生存的时间，单位是毫秒
+      min-evictable-idle-time-millis: 300000
+      validation-query: SELECT 1 FROM DUAL
+      test-while-idle: true
+      test-on-borrow: false
+      test-on-return: false
+      stat-view-servlet:
+        enabled: true
+        url-pattern: /monitor/druid/*
+      filter:
+        stat:
+          log-slow-sql: true
+          slow-sql-millis: 1000
+          merge-sql: false
+        wall:
+          config:
+            multi-statement-allow: true
+  servlet:
+    multipart:
+      max-file-size: 100MB # 单个文件大小
+      max-request-size: 100MB # 设置总上传的数据大小
+      enabled: true #开启
+  main:
+    allow-bean-definition-overriding: true
+
+#分布式事务
+# 默认之配置为TM的本机默认端口
+  # tx-manager 的配置地址，可以指定TM集群中的任何一个或多个地址
+  # tx-manager 下集群策略，每个TC都会从始至终<断线重连>与TM集群保持集群大小个连接。
+  # TM方，每有TM进入集群，会找到所有TC并通知其与新TM建立连接。
+  # TC方，启动时按配置与集群建立连接，成功后，会再与集群协商，查询集群大小并保持与所有TM的连接
+tx-lcn:
+  client:
+    manager-address: ${manager-server}:8070
+# 是否启动LCN负载均衡策略(优化选项，开启与否，功能不受影响)
+  ribbon:
+    loadbalancer:
+      dtx.enabled: true
+  springcloud:
+    loadbalance:
+      enabled: true
+
+#feign:
+#  hystrix:
+#    enabled: true
+##timeout config
+hystrix:
+  command:
+    default:
+      execution:
+        timeout:
+          enabled: true
+        isolation:
+          thread:
+            timeoutInMilliseconds: 60000
+ribbon:
+  #请求处理超时
+  ReadTimeout: 60000
+  #请求连接超时
+  ConnectTimeout: 60000
+  #首选实例重试次数
+  MaxAutoRetries: 1
+  #更换实例重试次数
+  MaxAutoRetriesNextServer: 2
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: "*"
+  endpoint:
+    health:
+      show-details: ALWAYS
+zuul:
+  max:
+    host:
+      connections: 500
+  host:
+    socket-timeout-millis: 60000
+    connect-timeout-millis: 60000
+
+# MyBatis
+mybatis:
+  # 搜索指定包别名
+  typeAliasesPackage: com.ryit
+  # 配置mapper的扫描，找到所有的mapper.xml映射文件
+  mapperLocations: classpath:mapper/*Mapper.xml
+  # 加载全局的配置文件
+  configLocation: classpath:mybatis-config.xml
+
+# JWT认证加密私钥(Base64加密)
+encryptJWTKey: MTIzNDU2
+# AccessToken过期时间(秒为单位)
+accessTokenExpireTime: 31536000 #60*60*24*24*365
+# RefreshToken过期时间(秒为单位)
+refreshTokenExpireTime: 31536000 #60*60*24*24*365
+# Shiro缓存过期时间(秒为单位)(一般设置与AccessToken过期时间一致)
+shiroCacheExpireTime: 31536000 #60*60*24*24*365
+
+spring.jackson.date-format: yyyy-MM-dd HH:mm:ss
+spring.jackson.time-zone: GMT+8
+
+#分页参数
+pagehelper:
+  params: pageNum=pageNum;pageSize=pageSize
+  offset-as-page-num: true
+  row-bounds-with-count: true
+  page-size-zero: true
+  reasonable: false
+  support-methods-arguments: false
+default-page-size: 10
+
+# 日志配置
+logging:
+  level:
+    com:
+      codingapi:
+        txlcn: DEBUG
+    com.ryit.dao: debug
+    org.springframework: WARN
+    org.spring.springboot.dao: debug
+
+# 微信相关配置
+wechat:
+  #微信公众号的用户名
+  appid: wx6a05efee4cfd57cc
+  #密钥
+  app_secret: 0ADBCED5F3073274CA4EC6347DD13E1E
+  #商户号（东莞迅秒犇信息科技有限公司）
+  mch_id: 1556070901
+  #证书地址
+  cert_path: abc.cert
+  #微信回调方法
+  notify_url: http://youziqiangdan.com:8088/credit-user-server/weChatPay/anon/notify
+  spbill_create_ip: 127.0.0.1
+
+#用户身份证号和真实姓名相关配置
+idCard:
+  appId: 203746946
+  appSecret: u3xc05llkp1xole8wd2hkxt2i8y97uyh
+  host: http://freeid.market.alicloudapi.com
+  path: /idcard/VerifyIdcardv2
+  appCode: 1e3d307ee47840b7b563197c1de7b3eb

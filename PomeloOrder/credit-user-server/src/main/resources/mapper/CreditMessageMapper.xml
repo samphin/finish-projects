@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.ryit.credituserserver.dao.CreditMessageMapper" >
+  <resultMap id="BaseResultMap" type="com.ryit.commons.entity.pojo.CreditMessage" >
+    <id column="id" property="id" jdbcType="INTEGER" />
+    <result column="user_id" property="userId" jdbcType="INTEGER" />
+    <result column="title" property="title" jdbcType="VARCHAR" />
+    <result column="content" property="content" jdbcType="VARCHAR" />
+    <result column="push_time" property="pushTime" jdbcType="TIMESTAMP"/>
+    <result column="read_status" jdbcType="BOOLEAN" property="readStatus" />
+  </resultMap>
+
+  <select id="selectHistoryMessage" parameterType="long" resultMap="BaseResultMap">
+    select id,user_id, title,content,push_time ,read_status from credit_message where user_id = #{userId} order by read_status,push_time desc
+  </select>
+
+  <insert id="insertBatch" keyColumn="id" keyProperty="id" parameterType="list" useGeneratedKeys="true">
+    insert into credit_message (user_id, title, content,push_time)
+    values
+    <foreach collection="list" item="item" index="index" separator=",">
+      (
+        #{item.userId,jdbcType=INTEGER},
+        #{item.title,jdbcType=VARCHAR},
+        #{item.content,jdbcType=VARCHAR},
+        #{item.pushTime,jdbcType=TIMESTAMP}
+      )
+    </foreach>
+  </insert>
+
+  <!--修改用户消息是否阅读状态-->
+  <update id="updateMessageReadStatus" parameterType="map">
+    update credit_message set read_status = #{readStatus} where user_id = #{userId} and id in
+    <foreach collection="ids" item="id" separator="," open="(" close=")">
+      #{id}
+    </foreach>
+  </update>
+</mapper>

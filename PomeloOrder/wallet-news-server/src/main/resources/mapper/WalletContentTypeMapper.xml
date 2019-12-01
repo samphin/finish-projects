@@ -1,0 +1,104 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ryit.walletnewsserver.dao.WalletContentTypeMapper">
+
+    <sql id="allResult">
+        <trim suffixOverrides=",">
+            id,
+            type_name,
+            parent_id,
+            top_parent_id,
+            level,
+        </trim>
+    </sql>
+
+    <resultMap type="com.ryit.commons.entity.vo.WalletContentTypeVo" id="BaseResultMap">
+        <result property="id" column="id"/>
+        <result property="typeName" column="type_name"/>
+        <result property="sort" column="sort"/>
+        <result property="parentId" column="parent_id"/>
+        <result property="topParentId" column="top_parent_id"/>
+        <result property="delFlag" column="del_flag"/>
+        <result property="level" column="level"/>
+        <result property="homeDisplayFlag" column="home_display_flag"/>
+    </resultMap>
+
+    <insert id="insertWalletContentType" useGeneratedKeys="true" keyProperty="id"
+            parameterType="com.ryit.commons.entity.pojo.WalletContentType">
+        INSERT INTO wallet_content_type
+        (
+        <trim suffixOverrides=",">
+            <if test="id!=null">id,</if>
+            <if test="typeName!=null">type_name,</if>
+            <if test="sort!=null">sort,</if>
+            <if test="parentId!=null">parent_id,</if>
+            <if test="topParentId!=null">top_parent_id,</if>
+            <if test="delFlag!=null">del_flag,</if>
+            <if test="level!=null">level,</if>
+            <if test="homeDisplayFlag!=null">home_display_flag,</if>
+        </trim>
+        )
+        VALUES
+        (
+        <trim suffixOverrides=",">
+            <if test="id!=null">#{id},</if>
+            <if test="typeName!=null">#{typeName},</if>
+            <if test="sort!=null">#{sort},</if>
+            <if test="parentId!=null">#{parentId},</if>
+            <if test="topParentId!=null">#{topParentId},</if>
+            <if test="delFlag!=null">#{delFlag},</if>
+            <if test="level!=null">#{level},</if>
+            <if test="homeDisplayFlag!=null">#{homeDisplayFlag},</if>
+        </trim>
+        )
+    </insert>
+
+    <update id="updateWalletContentType" parameterType="com.ryit.commons.entity.pojo.WalletContentType">
+        UPDATE wallet_content_type SET
+        <trim suffixOverrides=",">
+            <if test="typeName != null and typeName!=''">type_name = #{typeName},</if>
+            <if test="sort != null">sort = #{sort},</if>
+            <if test="parentId != null">parent_id = #{parentId},</if>
+            <if test="topParentId != null">top_parent_id = #{topParentId},</if>
+            <if test="delFlag != null and delFlag!=''">del_flag = #{delFlag},</if>
+            <if test="level != null and level!=''">level = #{level},</if>
+            <if test="homeDisplayFlag != null and homeDisplayFlag!=''">home_display_flag = #{homeDisplayFlag},</if>
+        </trim>
+        WHERE
+        <trim suffixOverrides="and">id = #{id} and</trim>
+    </update>
+
+    <select id="queryTypeList" resultMap="BaseResultMap" >
+        SELECT
+        <include refid="allResult"/>
+        FROM wallet_content_type WHERE del_flag = '0'
+        <if test="level != null">
+            AND level = #{level}
+        </if>
+        <if test="homeDisplayFlag != null">
+            AND home_display_flag = #{homeDisplayFlag}
+        </if>
+        order by sort asc
+    </select>
+
+    <select id="queryTypeByTopParentId" resultMap="BaseResultMap">
+        SELECT
+        <include refid="allResult"/>
+        FROM wallet_content_type WHERE del_flag = '0' AND top_parent_id =#{topParentId}
+    </select>
+
+    <select id="queryById" resultMap="BaseResultMap" parameterType="java.lang.Long">
+        SELECT
+        <include refid="allResult"/>
+        FROM wallet_content_type WHERE del_flag = '0' AND id =#{id}
+    </select>
+
+    <select id="querySidebarType" resultMap="BaseResultMap" parameterType="java.lang.Long">
+      SELECT
+      <include refid="allResult"/>
+        FROM wallet_content_type WHERE del_flag = '0' AND home_display_flag = 1 AND id != #{typeId}
+        order by sort asc
+    </select>
+
+
+</mapper>

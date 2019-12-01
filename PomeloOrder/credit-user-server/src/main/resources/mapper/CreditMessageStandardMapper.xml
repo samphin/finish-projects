@@ -1,0 +1,129 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.ryit.credituserserver.dao.CreditMessageStandardMapper" >
+  <resultMap id="BaseResultMap" type="com.ryit.commons.entity.pojo.CreditMessageStandard" >
+    <result column="user_id" property="userId" jdbcType="INTEGER" />
+    <result column="city" property="city" jdbcType="INTEGER" />
+    <result column="wages_way" property="wagesWay" jdbcType="INTEGER" />
+    <result column="accumulatioin_fund" property="accumulatioinFund" jdbcType="INTEGER" />
+    <result column="social_security" property="socialSecurity" jdbcType="INTEGER" />
+    <result column="house_property" property="houseProperty" jdbcType="INTEGER" />
+    <result column="car_property" property="carProperty" jdbcType="INTEGER" />
+    <result column="life_insurance" property="lifeInsurance" jdbcType="INTEGER" />
+    <result column="sesame_credit" property="sesameCredit" jdbcType="INTEGER" />
+    <result column="microfinance" property="microfinance" jdbcType="INTEGER" />
+    <result column="personal_credit" property="personalCredit" jdbcType="INTEGER" />
+    <result column="push_start_time" property="pushStartTime" jdbcType="VARCHAR" />
+    <result column="push_end_time" property="pushEndTime" jdbcType="VARCHAR" />
+  </resultMap>
+
+  <!--根据用户ID查询订单偏好信息-->
+  <select id="selectMessageStandard" parameterType="long" resultType="com.ryit.commons.entity.pojo.CreditMessageStandard">
+    SELECT
+    t1.city,
+    t2.area_name AS cityName,
+    t1.wages_way AS wagesWay,
+    t1.accumulatioin_fund AS accumulatioinFund,
+    t1.social_security AS socialSecurity,
+    t1.house_property AS houseProperty,
+    t1.car_property AS carProperty,
+    t1.life_insurance AS lifeInsurance,
+    t1.sesame_credit AS sesameCredit,
+    t1.microfinance,
+    t1.personal_credit AS personalCredit,
+    t1.push_start_time AS pushStartTime,
+    t1.push_end_time AS pushEndTime,
+    cu.message_flag AS messageFlag
+    FROM credit_message_standard t1
+    LEFT JOIN sys_area t2 ON t1.city = t2.code
+    LEFT JOIN credit_user cu ON t1.user_id = cu.id
+    WHERE  t1.user_id = #{userId}
+  </select>
+
+  <!--保存用户偏好信息-->
+  <insert id="insertSelective" parameterType="com.ryit.commons.entity.pojo.CreditMessageStandard" >
+    REPLACE into credit_message_standard
+    <trim prefix="(" suffix=")" suffixOverrides="," >
+      <if test="userId != null" >
+        user_id,
+      </if>
+      <if test="city != null" >
+        city,
+      </if>
+      <if test="wagesWay != null" >
+        wages_way,
+      </if>
+      <if test="accumulatioinFund != null" >
+        accumulatioin_fund,
+      </if>
+      <if test="socialSecurity != null" >
+        social_security,
+      </if>
+      <if test="houseProperty != null" >
+        house_property,
+      </if>
+      <if test="carProperty != null" >
+        car_property,
+      </if>
+      <if test="lifeInsurance != null" >
+        life_insurance,
+      </if>
+      <if test="sesameCredit != null" >
+        sesame_credit,
+      </if>
+      <if test="microfinance != null" >
+        microfinance,
+      </if>
+      <if test="personalCredit != null" >
+        personal_credit,
+      </if>
+      <if test="pushStartTime != null ">
+        push_start_time,
+      </if>
+      <if test="pushEndTime != null ">
+        push_end_time
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides="," >
+      <if test="userId != null" >
+        #{userId,jdbcType=INTEGER},
+      </if>
+      <if test="city != null" >
+        #{city,jdbcType=INTEGER},
+      </if>
+      <if test="wagesWay != null" >
+        #{wagesWay,jdbcType=INTEGER},
+      </if>
+      <if test="accumulatioinFund != null" >
+        #{accumulatioinFund,jdbcType=INTEGER},
+      </if>
+      <if test="socialSecurity != null" >
+        #{socialSecurity,jdbcType=INTEGER},
+      </if>
+      <if test="houseProperty != null" >
+        #{houseProperty,jdbcType=INTEGER},
+      </if>
+      <if test="carProperty != null" >
+        #{carProperty,jdbcType=INTEGER},
+      </if>
+      <if test="lifeInsurance != null" >
+        #{lifeInsurance,jdbcType=INTEGER},
+      </if>
+      <if test="sesameCredit != null" >
+        #{sesameCredit,jdbcType=INTEGER},
+      </if>
+      <if test="microfinance != null" >
+        #{microfinance,jdbcType=INTEGER},
+      </if>
+      <if test="personalCredit != null" >
+        #{personalCredit,jdbcType=INTEGER},
+      </if>
+      <if test="pushStartTime != null ">
+        #{pushStartTime,jdbcType=VARCHAR},
+      </if>
+      <if test="pushEndTime != null ">
+        #{pushEndTime,jdbcType=VARCHAR}
+      </if>
+    </trim>
+  </insert>
+</mapper>

@@ -1,0 +1,16 @@
+spring:
+  application:
+    name: solr-server
+  data:
+    solr:
+      news: http://120.76.128.142:8085/solr/wallet-news
+      host: http://120.76.128.142:8085/solr/
+#      host: http://172.18.104.237:8085/solr
+#      news: http://172.18.104.237:8085/solr/wallet-news
+server:
+  port: 8084
+eureka:
+  client:
+    service-url:
+      defaultZone: http://root:root@zone2:8081/eureka,http://root:root@zone1:8080/eureka
+

@@ -1,0 +1,131 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ryit.orderserver.dao.SysApplicationMapper">
+  <resultMap id="BaseResultMap" type="com.ryit.commons.entity.pojo.SysApplication">
+    <id column="id" jdbcType="BIGINT" property="id" />
+    <result column="name" jdbcType="VARCHAR" property="name" />
+    <result column="code" jdbcType="VARCHAR" property="code" />
+    <result column="version" jdbcType="VARCHAR" property="version" />
+    <result column="download_path" jdbcType="VARCHAR" property="downloadPath" />
+    <result column="update_flag" jdbcType="BOOLEAN" property="updateFlag" />
+    <result column="create_user_id" jdbcType="BIGINT" property="createUserId" />
+    <result column="user_name" jdbcType="VARCHAR" property="createUserName" />
+    <result column="create_time" jdbcType="TIMESTAMP" property="createTime" />
+  </resultMap>
+
+  <sql id="Base_Column_List">
+    sa.id, sa.`name`, sa.code, sa.version, sa.download_path,
+    sa.update_flag, sa.create_user_id, cu.user_name,
+    sa.create_time
+  </sql>
+  <select id="selectByPrimaryKey" parameterType="long" resultMap="BaseResultMap">
+    select <include refid="Base_Column_List"/> from sys_application sa
+    left join credit_user cu on sa.create_user_id = cu.id
+    where sa.id = #{id,jdbcType=BIGINT}
+  </select>
+
+  <select id="selectByCode" parameterType="string" resultMap="BaseResultMap">
+    select <include refid="Base_Column_List"/> from sys_application sa
+    left join credit_user cu on sa.create_user_id = cu.id
+    where sa.code = #{code,jdbcType=VARCHAR}
+    ORDER BY create_time DESC LIMIT 0,1
+  </select>
+
+  <select id="selectMaxVersion" parameterType="string" resultType="string">
+     SELECT MAX(VERSION) VERSION FROM sys_application where code = #{code,jdbcType=VARCHAR}
+  </select>
+
+  <select id="selectByVersion" parameterType="string" resultType="integer">
+    select count(id) from sys_application where version = #{version,jdbcType=VARCHAR}
+  </select>
+
+  <select id="selectAllByCondition"
+          parameterType="com.ryit.commons.entity.pojo.SysApplication"
+          resultMap="BaseResultMap">
+    select <include refid="Base_Column_List"/> from sys_application sa
+    left join credit_user cu on sa.create_user_id = cu.id
+    <where>
+      <if test="code != null and code != ''">
+        sa.code = #{code,jdbcType=VARCHAR}
+      </if>
+      <if test="version != null and version != ''">
+        and sa.version like concat('%',#{version,jdbcType=VARCHAR},'%')
+      </if>
+    </where>
+    order by sa.create_time desc ,sa.version desc
+  </select>
+
+  <insert id="insertSelective" keyColumn="id" keyProperty="id" useGeneratedKeys="true" parameterType="com.ryit.commons.entity.pojo.SysApplication">
+    insert into sys_application
+    <trim prefix="(" suffix=")" suffixOverrides=",">
+      <if test="name != null">
+        `name`,
+      </if>
+      <if test="code != null">
+        code,
+      </if>
+      <if test="version != null">
+        version,
+      </if>
+      <if test="downloadPath != null">
+        download_path,
+      </if>
+      <if test="updateFlag != null">
+        update_flag,
+      </if>
+      <if test="createUserId != null">
+        create_user_id,
+      </if>
+        create_time
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides=",">
+      <if test="name != null">
+        #{name,jdbcType=VARCHAR},
+      </if>
+      <if test="code != null">
+        #{code,jdbcType=VARCHAR},
+      </if>
+      <if test="version != null">
+        #{version,jdbcType=VARCHAR},
+      </if>
+      <if test="downloadPath != null">
+        #{downloadPath,jdbcType=VARCHAR},
+      </if>
+      <if test="updateFlag != null">
+        #{updateFlag,jdbcType=BOOLEAN},
+      </if>
+      <if test="createUserId != null">
+        #{createUserId,jdbcType=BIGINT},
+      </if>
+       SYSDATE()
+    </trim>
+  </insert>
+  <update id="updateByPrimaryKeySelective" parameterType="com.ryit.commons.entity.pojo.SysApplication">
+      update sys_application
+      <set>
+        <if test="name != null and name != ''">
+          `name` = #{name,jdbcType=VARCHAR},
+        </if>
+        <if test="code != null and code != ''">
+          code = #{code,jdbcType=VARCHAR},
+        </if>
+        <if test="version != null">
+          version = #{version,jdbcType=VARCHAR},
+        </if>
+        <if test="downloadPath != null">
+          download_path = #{downloadPath,jdbcType=VARCHAR},
+        </if>
+        <if test="updateFlag != null">
+          update_flag = #{updateFlag,jdbcType=BOOLEAN},
+        </if>
+        <if test="createUserId != null">
+          create_user_id = #{createUserId,jdbcType=BIGINT},
+        </if>
+      </set>
+      where id = #{id,jdbcType=BIGINT}
+  </update>
+
+  <delete id="deleteByPrimaryKey" parameterType="long">
+    delete from sys_application where id = #{id,jdbcType=BIGINT}
+  </delete>
+</mapper>

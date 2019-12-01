@@ -1,0 +1,558 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ryit.credituserserver.dao.CreditUserMapper">
+
+    <resultMap id="BaseResultMap" type="com.ryit.commons.entity.pojo.CreditUser">
+        <id column="id" jdbcType="INTEGER" property="id"/>
+        <result column="user_name" jdbcType="VARCHAR" property="userName"/>
+        <result column="email" jdbcType="VARCHAR" property="email"/>
+        <result column="phone" jdbcType="VARCHAR" property="phone"/>
+        <result column="remain_coin" jdbcType="DOUBLE" property="remainCoin"/>
+        <result column="sex" jdbcType="TINYINT" property="sex"/>
+        <result column="avatar" jdbcType="VARCHAR" property="avatar"/>
+        <result column="password" jdbcType="VARCHAR" property="password"/>
+        <result column="auth_flag" jdbcType="TINYINT" property="authFlag"/>
+        <result column="city" jdbcType="INTEGER" property="city"/>
+        <result column="company_type" jdbcType="VARCHAR" property="companyType"/>
+        <result column="company_name" jdbcType="VARCHAR" property="companyName"/>
+        <result column="company_addr" jdbcType="VARCHAR" property="companyAddr"/>
+        <result column="real_name" jdbcType="VARCHAR" property="realName"/>
+        <result column="real_addr" jdbcType="VARCHAR" property="realAddr"/>
+        <result column="real_code" jdbcType="VARCHAR" property="realCode"/>
+        <result column="active_life" jdbcType="VARCHAR" property="activeLife"/>
+        <result column="issuing_unit" jdbcType="VARCHAR" property="issuingUnit"/>
+        <result column="group_photo" jdbcType="VARCHAR" property="groupPhoto"/>
+        <result column="work_card" jdbcType="VARCHAR" property="workCard"/>
+        <result column="business_card" jdbcType="VARCHAR" property="businessCard"/>
+        <result column="contract_signature" jdbcType="VARCHAR" property="contractSignature"/>
+        <result column="message_flag" jdbcType="TINYINT" property="messageFlag"/>
+        <result column="invite_code" jdbcType="VARCHAR" property="inviteCode"/>
+        <result column="up_user" jdbcType="INTEGER" property="upUser"/>
+        <result column="admin_flag" jdbcType="BOOLEAN" property="adminFlag"/>
+        <result column="back_order_num" jdbcType="INTEGER" property="backOrderNum"/>
+        <result column="register_time" jdbcType="TIMESTAMP" property="registerTime"/>
+        <result column="invite_num" jdbcType="INTEGER" property="inviteNum"/>
+        <result column="open_id" jdbcType="VARCHAR" property="openId"/>
+    </resultMap>
+
+    <sql id="Base_Column_List">
+        id, user_name, email, phone, remain_coin, sex, avatar, `password`, auth_flag, city,
+        company_type, company_name, company_addr, real_name, real_addr, real_code, active_life,
+        issuing_unit, group_photo, work_card, business_card, contract_signature, message_flag,
+        invite_code, up_user, admin_flag, back_order_num, register_time, invite_num, open_id
+    </sql>
+
+    <select id="getBackOrderNum" parameterType="java.lang.Long" resultType="java.lang.Integer">
+        select back_order_num from credit_user where id = #{id}
+    </select>
+
+    <select id="getCreditUserByPhone" parameterType="java.lang.String"
+            resultType="com.ryit.commons.entity.pojo.CreditUser">
+        select id, phone, `password`,avatar,user_name AS userName,auth_flag AS authFlag,(case when admin_flag = 1 then 1
+        else null end) AS adminFlag,invite_code AS inviteCode,city
+        from credit_user where phone = #{phone}
+    </select>
+
+    <select id="getCreditUserByOpenId" parameterType="string" resultType="com.ryit.commons.entity.pojo.CreditUser">
+        SELECT id, phone, PASSWORD,avatar,user_name AS userName,
+        auth_flag AS authFlag,invite_code AS inviteCode,
+        (CASE WHEN admin_flag = 1 THEN 1 ELSE NULL END) AS adminFlag,
+        open_id AS openId,city
+        FROM credit_user where open_id = #{openId}
+    </select>
+
+    <!--根据管理员标识查询用户列表-->
+    <select id="selectAllCreditUsers" parameterType="integer" resultType="com.ryit.commons.entity.pojo.CreditUser">
+        SELECT id, phone,avatar,user_name AS userName , real_name as realName,open_id as openId FROM credit_user WHERE admin_flag = #{adminFlag}
+    </select>
+
+    <!--根据条件筛选非管理员列表-->
+    <select id="selectAllNotAdmins" parameterType="com.ryit.commons.entity.dto.CreditNotAdminUserDto" resultType="com.ryit.commons.entity.pojo.CreditUser">
+        SELECT id, phone,user_name AS userName , real_name as realName FROM credit_user
+        <where>
+            admin_flag = 0
+            <if test="phone != null and phone != ''">
+                and phone like concat('%',#{phone,jdbcType=VARCHAR},'%')
+            </if>
+            <if test="realName != null and realName != ''">
+                and real_name like concat('%',#{realName,jdbcType=VARCHAR},'%')
+            </if>
+            <if test="userName != null and userName != ''">
+                and user_name like concat('%',#{userName,jdbcType=VARCHAR},'%')
+            </if>
+        </where>
+    </select>
+
+    <select id="selectListByPrimaryKey" parameterType="long" resultType="com.ryit.commons.entity.pojo.CreditUser">
+        SELECT id,phone,avatar,user_name AS userName,open_id as openId,invite_code AS inviteCode FROM credit_user where
+        id = #{id}
+    </select>
+
+    <select id="getCreditUserCoinById" parameterType="java.lang.Long" resultType="java.lang.Double">
+        select remain_coin from credit_user where id = #{id}
+    </select>
+
+    <!--查询用户信息【优惠券数量、未读消息数量】-->
+    <select id="getCreditUser" resultType="java.util.Map">
+        SELECT avatar,
+        user_name AS username,
+        auth_flag AS authFlag,
+        remain_coin AS remianCoin,
+        phone,
+        invite_code AS inviteCode,
+        (SELECT COUNT(id) FROM credit_coupon cc
+        WHERE cc.user_id = #{id} AND cc.use_status = 0 AND SYSDATE() BETWEEN cc.valid_start_time AND cc.valid_end_time )
+        AS couponNum,
+        (SELECT COUNT(id) FROM credit_message cm WHERE cm.user_id = #{id} AND cm.read_status = 0 ) AS
+        noReadMessageNum,city
+        FROM credit_user WHERE id = #{id}
+    </select>
+
+    <select id="getPassword" parameterType="java.lang.Long" resultType="java.lang.String">
+        select password from credit_user where id = #{id}
+    </select>
+
+    <select id="getAuthInfo" parameterType="java.lang.Long" resultType="com.ryit.commons.entity.vo.CreditUserVo">
+        select cu.id,
+        cu.city,
+        (case when sa2.area_name is not null then concat(sa2.area_name,'-',sa1.area_name) else sa1.area_name end) AS
+        cityName,
+        cu.company_type AS companyType,
+        cu.company_name AS companyName,
+        cu.company_addr AS companyAddr,
+        cu.real_name AS realName,
+        cu.real_code AS realCode,
+        cu.issuing_unit AS issuingUnit,
+        cu.active_life AS activeLife,
+        cu.group_photo AS groupPhoto,
+        cu.work_card AS workCard,
+        cu.business_card AS businessCard,
+        cu.contract_signature AS contractSignature,
+        cuc.front_img AS frontImg,
+        cuc.after_img AS afterImg
+        from credit_user cu left join credit_user_card cuc on cu.id = cuc.user_id left join sys_area sa1 on cu.city =
+        sa1.code left join sys_area sa2 on sa1.parent_code = sa2.code where id = #{id}
+    </select>
+
+    <select id="getRechargeNum" parameterType="java.lang.Long" resultType="java.lang.Integer">
+        select count(1) from credit_bill where bill_type = 0 and user_id = #{userId}
+    </select>
+
+    <select id="getCreditUserIdByInviteCode" parameterType="java.lang.String" resultType="java.lang.Long">
+        select id from credit_user where invite_code = #{inviteCode}
+    </select>
+
+    <select id="checkInviteCode" parameterType="java.lang.String" resultType="java.lang.Integer">
+        select count(1) from credit_user where Invite_code = #{InviteCode}
+    </select>
+
+    <select id="getCreditUserById" parameterType="java.lang.Long" resultType="com.ryit.commons.entity.pojo.CreditUser">
+        select id,up_user AS upUser ,back_order_num AS backOrderNum,register_time AS registerTime,invite_num AS
+        inviteNum,city from credit_user where id = #{id}
+    </select>
+
+    <select id="checkPhone" parameterType="java.lang.String" resultType="java.lang.Integer">
+        select count(1) from credit_user where phone = #{phone}
+    </select>
+
+    <select id="selectUserByPhone" parameterType="java.lang.String" resultMap="BaseResultMap">
+        select
+        <include refid="Base_Column_List"/>
+        from credit_user where phone = #{phone}
+    </select>
+
+    <!--非空更新-->
+    <update id="updateByPrimaryKeySelective" parameterType="com.ryit.commons.entity.pojo.CreditUser">
+        update credit_user
+        <set>
+            <if test="userName != null">
+                user_name = #{userName,jdbcType=VARCHAR},
+            </if>
+            <if test="email != null">
+                email = #{email,jdbcType=VARCHAR},
+            </if>
+            <if test="phone != null">
+                phone = #{phone,jdbcType=VARCHAR},
+            </if>
+            <if test="remainCoin != null">
+                remain_coin = #{remainCoin,jdbcType=DOUBLE},
+            </if>
+            <if test="sex != null">
+                sex = #{sex,jdbcType=TINYINT},
+            </if>
+            <if test="avatar != null">
+                avatar = #{avatar,jdbcType=VARCHAR},
+            </if>
+            <if test="password != null">
+                `password` = #{password,jdbcType=VARCHAR},
+            </if>
+            <if test="authFlag != null">
+                auth_flag = #{authFlag,jdbcType=TINYINT},
+            </if>
+            <if test="city != null">
+                city = #{city,jdbcType=INTEGER},
+            </if>
+            <if test="companyType != null">
+                company_type = #{companyType,jdbcType=VARCHAR},
+            </if>
+            <if test="companyName != null">
+                company_name = #{companyName,jdbcType=VARCHAR},
+            </if>
+            <if test="companyAddr != null">
+                company_addr = #{companyAddr,jdbcType=VARCHAR},
+            </if>
+            <if test="realName != null">
+                real_name = #{realName,jdbcType=VARCHAR},
+            </if>
+            <if test="realAddr != null">
+                real_addr = #{realAddr,jdbcType=VARCHAR},
+            </if>
+            <if test="realCode != null">
+                real_code = #{realCode,jdbcType=VARCHAR},
+            </if>
+            <if test="activeLife != null">
+                active_life = #{activeLife,jdbcType=VARCHAR},
+            </if>
+            <if test="issuingUnit != null">
+                issuing_unit = #{issuingUnit,jdbcType=VARCHAR},
+            </if>
+            <if test="groupPhoto != null">
+                group_photo = #{groupPhoto,jdbcType=VARCHAR},
+            </if>
+            <if test="workCard != null">
+                work_card = #{workCard,jdbcType=VARCHAR},
+            </if>
+            <if test="businessCard != null">
+                business_card = #{businessCard,jdbcType=VARCHAR},
+            </if>
+            <if test="contractSignature != null">
+                contract_signature = #{contractSignature,jdbcType=VARCHAR},
+            </if>
+            <if test="messageFlag != null">
+                message_flag = #{messageFlag,jdbcType=TINYINT},
+            </if>
+            <if test="inviteCode != null">
+                invite_code = #{inviteCode,jdbcType=VARCHAR},
+            </if>
+            <if test="upUser != null">
+                up_user = #{upUser,jdbcType=INTEGER},
+            </if>
+            <if test="adminFlag != null">
+                admin_flag = #{adminFlag,jdbcType=BOOLEAN},
+            </if>
+            <if test="backOrderNum != null">
+                back_order_num = #{backOrderNum,jdbcType=INTEGER},
+            </if>
+            <if test="registerTime != null">
+                register_time = #{registerTime,jdbcType=TIMESTAMP},
+            </if>
+            <if test="inviteNum != null">
+                invite_num = #{inviteNum,jdbcType=INTEGER},
+            </if>
+            <if test="openId != null">
+                open_id = #{openId,jdbcType=VARCHAR},
+            </if>
+        </set>
+        where id = #{id}
+    </update>
+
+    <select id="getCreditUserForRedis" parameterType="java.lang.Long"
+            resultType="com.ryit.commons.entity.pojo.CreditUser">
+        select id, phone, `password`,avatar,user_name AS userName,invite_code AS inviteCode,auth_flag AS authFlag,(case
+        when admin_flag = 1 then 1 else null end) AS adminFlag
+        from credit_user
+        where id = #{id}
+    </select>
+
+    <insert id="insertCreditUser" keyColumn="id" keyProperty="id"
+            parameterType="com.ryit.commons.entity.pojo.CreditUser" useGeneratedKeys="true">
+        insert into credit_user (user_name, email, phone,
+        avatar,
+        `password`,
+        city, company_type,
+        company_name, company_addr, real_name,
+        real_addr, real_code, active_life,
+        issuing_unit, group_photo, work_card,
+        business_card, contract_signature,
+        invite_code, up_user,register_time,sex,open_id
+        )
+        values (#{userName}, #{email}, #{phone},
+        #{avatar}, #{password},
+        #{city}, #{companyType},
+        #{companyName}, #{companyAddr}, #{realName},
+        #{realAddr}, #{realCode}, #{activeLife},
+        #{issuingUnit}, #{groupPhoto}, #{workCard},
+        #{businessCard}, #{contractSignature},
+        #{inviteCode}, #{upUser},sysdate(),
+        #{sex},#{openId}
+        )
+    </insert>
+
+    <update id="updateCreditUserCoin" parameterType="java.util.Map">
+        update credit_user
+        <set>
+            <if test="coin != null">
+                remain_coin = remain_coin + #{coin},
+            </if>
+            <if test="inviteNum != null">
+                invite_num = invite_num + #{inviteNum},
+            </if>
+            <if test="backOrderNum != null">
+                back_order_num = back_order_num + #{backOrderNum},
+            </if>
+        </set>
+        where id = #{id}
+    </update>
+
+    <update id="subtractBackOrderNum" parameterType="map">
+        update credit_user set back_order_num = back_order_num - 1,remain_coin = remain_coin + #{coin} where id = #{id}
+    </update>
+
+    <!--根据手机号将用户升级成为管理员-->
+    <update id="upgradeToAdminByPhone" parameterType="string">
+        update credit_user set admin_flag = 1 where phone = #{phone}
+    </update>
+
+    <update id="updateCreditUser" parameterType="java.util.Map">
+        update credit_user
+        <set>
+            <if test="userName != null and userName != ''">
+                user_name = #{userName},
+            </if>
+            <if test="email != null">
+                email = #{email},
+            </if>
+            <if test="phone != null and phone != ''">
+                phone = #{phone},
+            </if>
+            <if test="sex != null">
+                sex = #{sex},
+            </if>
+            <if test="avatar != null and avatar != ''">
+                avatar = #{avatar},
+            </if>
+            <if test="password != null and password != ''">
+                password = #{password},
+            </if>
+            <if test="city != null">
+                city = #{city},
+            </if>
+            <if test="companyType != null and companyType != ''">
+                company_type = #{companyType},
+            </if>
+            <if test="authFlag != null">
+                auth_flag = #{authFlag},
+            </if>
+            <if test="companyName != null and companyName != ''">
+                company_name = #{companyName},
+            </if>
+            <if test="companyAddr != null and companyAddr != ''">
+                company_addr = #{companyAddr},
+            </if>
+            <if test="realName != null and realName != ''">
+                real_name = #{realName},
+            </if>
+            <if test="realAddr != null and realAddr != ''">
+                real_addr = #{realAddr},
+            </if>
+            <if test="realCode != null and realCode != ''">
+                real_code = #{realCode},
+            </if>
+            <if test="activeLife != null and activeLife != ''">
+                active_life = #{activeLife},
+            </if>
+            <if test="issuingUnit != null and issuingUnit != ''">
+                issuing_unit = #{issuingUnit},
+            </if>
+            <if test="groupPhoto!= null and groupPhoto != ''">
+                group_photo = #{groupPhoto},
+            </if>
+            <if test="workCard != null and workCard != ''">
+                work_card = #{workCard},
+            </if>
+            <if test="businessCard != null and businessCard != ''">
+                business_card = #{businessCard},
+            </if>
+            <if test="contractSignature != null and contractSignature != ''">
+                contract_signature = #{contractSignature},
+            </if>
+            <if test="messageFlag != null">
+                message_flag = #{messageFlag},
+            </if>
+            <if test="adminFlag != null">
+                admin_flag = #{adminFlag},
+            </if>
+            <if test="backOrderNum != null">
+                back_order_num = #{backOrderNum},
+            </if>
+        </set>
+        where id = #{id}
+    </update>
+
+    <update id="reserPassword" parameterType="java.util.Map">
+        update credit_user set password = #{password} where phone = #{phone}
+    </update>
+
+    <update id="updateMessageFlag" parameterType="map">
+        update credit_user set message_flag = #{messageFlag} where id = #{userId}
+    </update>
+
+    <insert id="insertCreditUserCard" parameterType="com.ryit.commons.entity.pojo.CreditUserCard">
+        insert into credit_user_card (user_id,front_img, after_img) values (#{userId},#{frontImg}, #{afterImg})
+        ON DUPLICATE KEY UPDATE front_img= #{frontImg},after_img=#{afterImg}
+    </insert>
+
+    <update id="updateCreditUserCard" parameterType="com.ryit.commons.entity.pojo.CreditUserCard">
+        update credit_user_card
+        <set>
+            <if test="frontImg != null">
+                front_img = #{frontImg},
+            </if>
+            <if test="afterImg != null">
+                after_img = #{afterImg},
+            </if>
+        </set>
+        where user_id = #{userId}
+    </update>
+
+    <select id="getCreditUserByPage" parameterType="com.ryit.commons.entity.dto.CreditUserDto"
+            resultType="com.ryit.commons.entity.vo.CreditUserVo">
+        select
+        u.id,
+        user_name as userName,
+        real_name AS realName,
+        phone,
+        remain_coin as remainCoin,
+        sex,
+        auth_flag as authFlag,
+        city,
+        company_type as companyType,
+        company_name as companyName,
+        company_addr as companyAddr,
+        invite_num as inviteNum,
+        sa.area_name as cityName,
+        u.register_time as registerTime
+        from credit_user u
+        LEFT JOIN sys_area sa on sa.code = u.city
+        <where>
+            <if test="authFlag != null">and auth_flag = #{authFlag}</if>
+            <if test="city != null and city != ''">and city = #{city}</if>
+            <if test="userName != null and userName != ''">and user_name like concat('%',#{userName},'%')</if>
+            <if test="phone != null and phone != ''">and phone like concat('%',#{phone},'%')</if>
+        </where>
+        order by u.id desc
+    </select>
+
+    <sql id="user_info">
+        id,
+        user_name as userName,
+        email,
+        phone,
+        remain_coin as remainCoin,
+        sex,
+        auth_flag as authFlag,
+        city,
+        company_type as companyType,
+        company_name as companyName,
+        company_addr as companyAddr,
+        invite_num as inviteNum,
+        real_name as realName,
+        real_addr as realAddr,
+        real_code as realCode,
+        active_life as activeLife,
+        issuing_unit as issuingUnit,
+        group_photo as groupPhoto,
+        work_card  as workCard,
+        business_card as businessCard,
+        contract_signature as contractSignature,
+        message_flag as messageFlag,
+        invite_code as inviteCode,
+        up_user as upUser,
+        admin_flag as adminFlag,
+        back_order_num as backOrderNum,
+        register_time as registerTime
+    </sql>
+
+    <select id="getCreditUserInfo" parameterType="java.lang.Long"
+            resultType="com.ryit.commons.entity.vo.CreditUserVo">
+        select
+        <include refid="user_info"></include>,
+        uc.front_img frontImg,
+        uc.after_img afterImg,
+        sa.area_name cityName
+        from credit_user u
+        LEFT JOIN credit_user_card uc on u.id = uc.user_id
+        LEFT JOIN sys_area sa on sa.code = u.city
+        where u.id = #{id}
+    </select>
+
+    <update id="updateAuthFlag" parameterType="com.ryit.commons.entity.pojo.CreditUser">
+        update credit_user set auth_flag = #{authFlag} where id = #{id}
+    </update>
+
+    <delete id="deleteAdmin" parameterType="java.lang.Long">
+        delete from credit_user where id = #{id}
+    </delete>
+
+    <insert id="addAdmin" keyProperty="id"
+            parameterType="com.ryit.commons.entity.dto.CreditUserDto" useGeneratedKeys="true">
+        insert into credit_user (
+        user_name, email, phone,
+        avatar,`password`,sex,
+        city,register_time,admin_flag
+        )
+        values (#{userName}, #{email}, #{phone},
+        #{avatar}, #{password},#{sex},
+        #{city},sysdate(), #{adminFlag}
+        )
+    </insert>
+
+    <select id="getAdminInfo" parameterType="java.lang.Long"
+            resultType="com.ryit.commons.entity.pojo.CreditUser">
+        select
+        u.id,
+        u.user_name as userName,
+        u.email,
+        u.phone,
+        u.sex,
+        u.avatar,
+        r.role_id as roleId
+        from credit_user u
+        LEFT JOIN credit_user_role ur on ur.user_id = u.id
+        LEFT JOIN credit_role r on r.role_id = ur.role_id
+        where id = #{id}
+    </select>
+
+    <select id="getAdminList" parameterType="com.ryit.commons.entity.dto.CreditUserDto"
+            resultType="com.ryit.commons.entity.vo.CreditUserVo">
+        select
+        u.id,
+        u.user_name as userName,
+        u.email,
+        u.phone,
+        u.sex,
+        r.role_id as roleId,
+        r.role_name as roleName
+        from credit_user u
+        LEFT JOIN credit_user_role ur on ur.user_id = u.id
+        LEFT JOIN credit_role r on r.role_id = ur.role_id
+        <where>
+            admin_flag = 1
+            <if test="roleName != null and roleName != ''">and role_name = #{roleName}</if>
+            <if test="userName != null and userName != ''">and u.user_name like concat('%',#{userName},'%')</if>
+            <if test="phone != null and phone != ''">and u.phone like concat('%',#{phone},'%')</if>
+        </where>
+    </select>
+
+
+    <select id="checkPhoneUnique" parameterType="java.lang.String" resultType="java.lang.Integer">
+        select count(1) from credit_user where phone = #{phone}
+    </select>
+
+    <select id="selectUserInviteInfo" parameterType="long"
+            resultType="com.ryit.commons.entity.vo.CreditUserInviteInfoVo">
+        SELECT invite_num AS persons,(SELECT SUM(coin) AS prize FROM credit_invite WHERE num <![CDATA[<= ]]> invite_num) AS prize FROM credit_user WHERE id = 56
+    </select>
+
+
+</mapper>

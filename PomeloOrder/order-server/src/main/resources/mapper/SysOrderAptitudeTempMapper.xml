@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ryit.orderserver.dao.SysOrderAptitudeTempMapper">
+  <resultMap id="BaseResultMap" type="com.ryit.commons.entity.pojo.SysOrderAptitudeTemp">
+    <id column="id" jdbcType="BIGINT" property="id" />
+    <result column="name" jdbcType="VARCHAR" property="name" />
+    <result column="code" jdbcType="VARCHAR" property="code" />
+    <result column="label" jdbcType="VARCHAR" property="label" />
+    <result column="value" jdbcType="INTEGER" property="value" />
+    <result column="score" jdbcType="INTEGER" property="score" />
+    <result column="priority" jdbcType="INTEGER" property="priority" />
+    <result column="order_id" jdbcType="BIGINT" property="orderId" />
+  </resultMap>
+  <sql id="Base_Column_List">
+    id, `name`, code, `label`, `value`, score, priority, order_id
+  </sql>
+  <!--查询订单资质信息-->
+  <select id="selectAllByOrderId" parameterType="long" resultMap="BaseResultMap">
+    select <include refid="Base_Column_List"/> from sys_order_aptitude_temp
+    where order_id = #{orderId}
+  </select>
+
+  <!--清空订单资质信息-->
+  <delete id="clearOrderAptitude" parameterType="long">
+    delete from sys_order_aptitude_temp where order_id = #{orderId}
+  </delete>
+
+  <!--批量保存订单资质-->
+  <insert id="batchInsertAptitude" parameterType="list">
+    insert into sys_order_aptitude_temp(name,code,value,label,score,priority,order_id) values
+    <foreach collection="list" item="item" separator="," index="index">
+      (
+      #{item.name},
+      #{item.code},
+      #{item.value},
+      #{item.label},
+      #{item.score},
+      #{item.priority},
+      #{item.orderId}
+      )
+    </foreach>
+  </insert>
+</mapper>

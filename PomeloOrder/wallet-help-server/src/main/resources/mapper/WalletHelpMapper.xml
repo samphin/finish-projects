@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ryit.wallethelpserver.dao.WalletHelpMapper">
+
+
+    <insert id="insertWalletHelp" useGeneratedKeys="true" keyProperty="id"
+            parameterType="com.ryit.commons.entity.pojo.WalletHelp">
+        INSERT INTO wallet_help
+        (
+        <trim suffixOverrides=",">
+            <if test="id!=null">id,</if>
+            <if test="ask!=null">ask,</if>
+            <if test="sort!=null">sort,</if>
+            <if test="answer!=null">answer,</if>
+        </trim>
+        )
+        VALUES
+        (
+        <trim suffixOverrides=",">
+            <if test="id!=null">#{id},</if>
+            <if test="ask!=null">#{ask},</if>
+            <if test="sort!=null">#{sort},</if>
+            <if test="answer!=null">#{answer},</if>
+        </trim>
+        )
+    </insert>
+
+    <select id="queryWalletHelpList" resultType="com.ryit.commons.entity.pojo.WalletHelp">
+        SELECT id,ask,answer FROM wallet_help ORDER BY sort DESC
+    </select>
+
+    <select id="queryWalletHelpById" resultType="com.ryit.commons.entity.pojo.WalletHelp"
+            parameterType="java.lang.Long">
+        SELECT id,ask,answer FROM wallet_help WHERE id =#{id}
+    </select>
+
+    <update id="updateWalletHelp" parameterType="com.ryit.commons.entity.pojo.WalletHelp">
+        UPDATE wallet_help SET
+        <trim suffixOverrides=",">
+            <if test="ask != null and ask!=''">ask = #{ask},</if>
+            <if test="sort != null">sort = #{sort},</if>
+            <if test="answer != null and answer!=''">answer = #{answer},</if>
+        </trim>
+        WHERE
+        <trim suffixOverrides="and">id = #{id} and</trim>
+    </update>
+
+    <delete id="deleteWalletHelp" parameterType="java.lang.Long">
+        DELETE FROM wallet_help WHERE id IN
+        <foreach collection="ids" index="index" item="item" open="(" separator="," close=")">
+            #{item}
+        </foreach>
+    </delete>
+
+</mapper>

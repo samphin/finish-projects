@@ -1,0 +1,89 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ryit.credituserserver.dao.CreditRoleMapper">
+
+    <sql id="selectRoleVo">
+        select
+        r.role_id  as roleId,
+        r.role_name as roleName,
+        r.role_key as roleKey,
+        r.role_sort as roleSort,
+        r.data_scope as dataScope,
+        r.status,
+        r.del_flag as delFlag
+        from credit_role r
+    </sql>
+
+    <select id="getCreditRoleByPage" parameterType="com.ryit.commons.entity.dto.CreditRoleDto"
+            resultType="com.ryit.commons.entity.pojo.CreditRole">
+            <include refid="selectRoleVo"></include>
+            where r.del_flag = '0'
+            <if test="roleName != null and roleName != ''">
+                AND r.role_name like concat('%', #{roleName}, '%')
+            </if>
+            <if test="status != null and status != ''">
+                AND r.status = #{status}
+            </if>
+            <if test="roleKey != null and roleKey != ''">
+                AND r.role_key like concat('%', #{roleKey}, '%')
+            </if>
+            <if test="dataScope != null and dataScope != ''">
+                AND r.data_scope = #{dataScope}
+            </if>
+    </select>
+
+    <select id="getCreditRoleInfo" parameterType="com.ryit.commons.entity.pojo.CreditRole"
+            resultType="com.ryit.commons.entity.vo.CreditRoleVo">
+        <include refid="selectRoleVo"></include>
+        where r.del_flag = '0' and  r.role_id = #{roleId}
+    </select>
+
+    <insert id="saveRole" parameterType="com.ryit.commons.entity.dto.CreditRoleDto"
+            useGeneratedKeys="true" keyProperty="roleId" keyColumn="role_id">
+            insert into credit_role (
+                role_name,role_key,role_sort,data_scope,status
+            )values (
+                #{roleName}, #{roleKey}, #{roleSort}, #{dataScope}, #{status}
+            )
+    </insert>
+
+    <update id="editRole" parameterType="com.ryit.commons.entity.dto.CreditRoleDto">
+          update credit_role
+          <set>
+              <if test="roleName != null and roleName != ''"> role_name = #{roleName},</if>
+              <if test="roleKey != null and roleKey != ''"> role_key = #{roleKey},</if>
+              <if test="roleSort != null"> role_sort = #{roleSort},</if>
+              <if test="dataScope != null and dataScope != ''"> data_scope = #{dataScope},</if>
+              <if test="status != null"> status = #{status},</if>
+          </set>
+        where role_id = #{roleId}
+    </update>
+
+    <update id="deleteRole" parameterType="java.lang.Long">
+         update credit_role set del_flag = 2 where role_id = #{roleId}
+    </update>
+
+    <select id="checkRoleNameUnique" parameterType="java.lang.String" resultType="java.lang.Integer">
+            select COUNT(1) from credit_role where del_flag = 0 and role_name = #{roleName}
+    </select>
+
+    <select id="checkRoleKeyUnique" parameterType="java.lang.String" resultType="java.lang.Integer">
+         select COUNT(1) from credit_role where del_flag = 0 and role_key = #{roleKey}
+    </select>
+
+
+    <select id="getCreditRoleAll" resultType="com.ryit.commons.entity.pojo.CreditRole">
+        select
+            r.role_id  as roleId,
+            r.role_name as roleName,
+            r.role_key as roleKey,
+            r.role_sort as roleSort,
+            r.data_scope as dataScope,
+            r.status,
+            r.del_flag as delFlag
+        from credit_role r where r.del_flag = '0'
+    </select>
+
+</mapper>

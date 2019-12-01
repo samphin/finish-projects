@@ -1,0 +1,199 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ryit.walletmarketserver.dao.WalletLoanMarketMapper">
+
+    <resultMap type="com.ryit.commons.entity.vo.WalletLoanMarketVo" id="ResultMap">
+        <result property="id" column="id"/>
+        <result property="loanName" column="loan_name"/>
+        <result property="quotaStart" column="quota_start"/>
+        <result property="quotaEnd" column="quota_end"/>
+        <result property="recommend" column="recommend"/>
+        <result property="loanCategory" column="loan_category"/>
+        <result property="fastFlag" column="fast_flag"/>
+        <result property="highFlag" column="high_flag"/>
+        <result property="longFlag" column="long_flag"/>
+        <result property="passFlag" column="pass_flag"/>
+        <result property="lowFlag" column="low_flag"/>
+        <result property="newFlag" column="new_flag"/>
+        <result property="description" column="description"/>
+        <result property="labelDesc" column="label_desc"/>
+        <result property="urlLink" column="url_link"/>
+        <result property="monthlyRate" column="monthly_rate"/>
+        <result property="loanTerm" column="loan_term"/>
+        <result property="loanSpeed" column="loan_speed"/>
+        <result property="applyConditions" column="apply_conditions"/>
+        <result property="icon" column="icon"/>
+        <result property="city" column="city"/>
+        <result property="areaName" column="area_name"/>
+        <result property="parentCode" column="parent_code"/>
+    </resultMap>
+
+    <sql id="allResult">
+        <trim suffixOverrides=",">
+            id,
+            loan_name,
+            quota_start,
+            quota_end,
+            recommend,
+            loan_category,
+            fast_flag,
+            high_flag,
+            long_flag,
+            pass_flag,
+            low_flag,
+            new_flag,
+            description,
+            label_desc,
+            url_link,
+            monthly_rate,
+            loan_term,
+            loan_speed,
+            apply_conditions,
+            icon,
+            city,
+        </trim>
+    </sql>
+
+    <insert id="insertWalletLoanMarket" keyProperty="id" keyColumn="id"
+            parameterType="com.ryit.commons.entity.pojo.WalletLoanMarket" useGeneratedKeys="true">
+        INSERT INTO wallet_loan_market
+        (
+        <trim suffixOverrides=",">
+            <if test="id != null">id,</if>
+            <if test="loanName != null">loan_name,</if>
+            <if test="quotaStart != null">quota_start,</if>
+            <if test="quotaEnd != null">quota_end,</if>
+            <if test="recommend != null">recommend,</if>
+            <if test="loanCategory != null">loan_category,</if>
+            <if test="fastFlag != null">fast_flag,</if>
+            <if test="highFlag != null">high_flag,</if>
+            <if test="longFlag != null">long_flag,</if>
+            <if test="passFlag != null">pass_flag,</if>
+            <if test="lowFlag != null">low_flag,</if>
+            <if test="newFlag != null">new_flag,</if>
+            <if test="description != null">description,</if>
+            <if test="labelDesc != null">label_desc,</if>
+            <if test="urlLink != null">url_link,</if>
+            <if test="monthlyRate != null">monthly_rate,</if>
+            <if test="loanTerm != null">loan_term,</if>
+            <if test="loanSpeed != null">loan_speed,</if>
+            <if test="applyConditions != null">apply_conditions,</if>
+            <if test="icon != null">icon,</if>
+            <if test="city != null">city,</if>
+        </trim>
+        )
+        VALUES
+        (
+        <trim suffixOverrides=",">
+            <if test="id != null">#{id},</if>
+            <if test="loanName != null">#{loanName},</if>
+            <if test="quotaStart != null">#{quotaStart},</if>
+            <if test="quotaEnd != null">#{quotaEnd},</if>
+            <if test="recommend != null">#{recommend},</if>
+            <if test="loanCategory != null">#{loanCategory},</if>
+            <if test="fastFlag != null">#{fastFlag},</if>
+            <if test="highFlag != null">#{highFlag},</if>
+            <if test="longFlag != null">#{longFlag},</if>
+            <if test="passFlag != null">#{passFlag},</if>
+            <if test="lowFlag != null">#{lowFlag},</if>
+            <if test="newFlag != null">#{newFlag},</if>
+            <if test="description != null">#{description},</if>
+            <if test="labelDesc != null">#{labelDesc},</if>
+            <if test="urlLink != null">#{urlLink},</if>
+            <if test="monthlyRate != null">#{monthlyRate},</if>
+            <if test="loanTerm != null">#{loanTerm},</if>
+            <if test="loanSpeed != null">#{loanSpeed},</if>
+            <if test="applyConditions != null">#{applyConditions},</if>
+            <if test="icon != null">#{icon},</if>
+            <if test="city != null">#{city},</if>
+        </trim>
+        )
+    </insert>
+
+    <select id="queryWalletLoanMarketByCondition" resultMap="ResultMap"
+            parameterType="com.ryit.commons.entity.dto.WalletLoanMarketQueryDto">
+        SELECT
+        <include refid="allResult"/>,area_name
+        FROM wallet_loan_market
+        LEFT JOIN sys_area ON code = city
+        <where>
+            1=1
+            <if test="areaName != null and areaName != ''">
+                AND area_name =#{areaName}
+            </if>
+            <if test="recommend != null and recommend != ''">
+                AND recommend =#{recommend}
+            </if>
+            <if test="loanCategory != null and loanCategory != ''">
+                AND loan_category =#{loanCategory}
+            </if>
+            <if test="fastFlag != null and fastFlag != ''">
+                AND fast_flag =#{fastFlag}
+            </if>
+            <if test="highFlag != null and highFlag != ''">
+                AND high_flag =#{highFlag}
+            </if>
+            <if test="longFlag != null and longFlag != ''">
+                AND long_flag =#{longFlag}
+            </if>
+            <if test="passFlag != null and passFlag != ''">
+                AND pass_flag =#{passFlag}
+            </if>
+            <if test="lowFlag != null and lowFlag != ''">
+                AND low_flag =#{lowFlag}
+            </if>
+            <if test="newFlag != null and newFlag != ''">
+                AND new_flag =#{newFlag}
+            </if>
+            <if test="city != null and city != ''">
+                AND city =#{city}
+            </if>
+        </where>
+    </select>
+
+    <select id="queryWalletLoanMarketById" resultMap="ResultMap" parameterType="java.lang.Long">
+        SELECT
+        <include refid="allResult"/>,area_name,parent_code
+        FROM wallet_loan_market
+        LEFT JOIN sys_area ON code = city
+        WHERE id =#{id}
+    </select>
+
+
+    <update id="updateWalletLoanMarket" parameterType="com.ryit.commons.entity.pojo.WalletLoanMarket">
+        UPDATE wallet_loan_market SET
+        <trim suffixOverrides=",">
+            <if test="loanName != null and loanName!=''">loan_name = #{loanName},</if>
+            <if test="quotaStart != null">quota_start = #{quotaStart},</if>
+            <if test="quotaEnd != null">quota_end = #{quotaEnd},</if>
+            <if test="recommend != null">recommend = #{recommend},</if>
+            <if test="loanCategory != null and loanCategory!=''">loan_category = #{loanCategory},</if>
+            <if test="fastFlag != null">fast_flag = #{fastFlag},</if>
+            <if test="highFlag != null">high_flag = #{highFlag},</if>
+            <if test="longFlag != null">long_flag = #{longFlag},</if>
+            <if test="passFlag != null">pass_flag = #{passFlag},</if>
+            <if test="lowFlag != null">low_flag = #{lowFlag},</if>
+            <if test="newFlag != null">new_flag = #{newFlag},</if>
+            <if test="description != null and description!=''">description = #{description},</if>
+            <if test="labelDesc != null and labelDesc!=''">label_desc = #{labelDesc},</if>
+            <if test="urlLink != null and urlLink!=''">url_link = #{urlLink},</if>
+            <if test="monthlyRate != null">monthly_rate = #{monthlyRate},</if>
+            <if test="loanTerm != null and loanTerm!=''">loan_term = #{loanTerm},</if>
+            <if test="loanSpeed != null and loanSpeed!=''">loan_speed = #{loanSpeed},</if>
+            <if test="applyConditions != null and applyConditions!=''">apply_conditions = #{applyConditions},</if>
+            <if test="icon != null and icon!=''">icon = #{icon},</if>
+            <if test="city != null">city = #{city},</if>
+        </trim>
+        WHERE
+        <trim suffixOverrides="and">id = #{id} and</trim>
+    </update>
+
+    <delete id="deleteWalletLoanMarket" parameterType="java.lang.Long">
+        DELETE FROM wallet_loan_market WHERE id IN
+        <foreach collection="ids" index="index" item="item" open="(" separator="," close=")">
+            #{item}
+        </foreach>
+    </delete>
+
+
+</mapper>

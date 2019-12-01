@@ -1,0 +1,122 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ryit.credituserserver.dao.CreditBillMapper">
+
+    <resultMap id="BaseResultMap" type="com.ryit.commons.entity.pojo.CreditBill">
+        <result column="id" property="id" jdbcType="INTEGER"/>
+        <result column="user_id" property="userId" jdbcType="INTEGER"/>
+        <result column="bill_coin" property="billCoin" jdbcType="DOUBLE"/>
+        <result column="bill_type" property="billType" jdbcType="BIT"/>
+        <result column="bill_time" property="billTime" jdbcType="TIMESTAMP"/>
+        <result column="coupon_id" property="couponId" jdbcType="INTEGER"/>
+        <result column="bill_money" property="billMoney" jdbcType="DOUBLE"/>
+    </resultMap>
+
+    <select id="getBillListByCreditUser" parameterType="java.lang.Long"
+            resultType="com.ryit.commons.entity.vo.CreditBillVo">
+        select cb.id,
+        cb.bill_coin AS billCoin,
+        cb.bill_type AS billType,
+        cb.bill_time AS billTime,
+        cb.coupon_id AS couponId,
+        cb.bill_money AS billMoney,
+        wu.realname AS walletUserName,
+        so.order_money AS creditMoney,
+        so.order_term AS orderTerm
+        from credit_bill cb left join sys_order so on (((cb.bill_type = 1 and cb.id = so.pay_id)
+        or (cb.bill_type = 2 and cb.id = so.back_id)) and so.order_status = 1)
+        left join wallet_user wu on so.wallet_user_id = wu.id
+        where cb.user_id = #{account}
+        order by cb.bill_time desc
+    </select>
+
+    <select id="getBillCountByCreditUser" parameterType="java.lang.Long" resultType="java.util.Map">
+        select (select IFNULL(remain_coin,0) from credit_user where id = #{id}) AS remianCoin,
+        (select IFNULL(sum(bill_coin),0) from credit_bill cb where cb.bill_type = 1 and cb.user_id = #{id}) AS payCoin,
+        (select IFNULL(sum(bill_coin),0) from credit_bill cb left join sys_order so on (cb.bill_type = 2 and cb.id =
+        so.back_id) where cb.user_id = #{id} and so.back_status = 1) AS backCoin,
+        (select IFNULL(sum(so.order_money),0) from credit_bill cb left join sys_order so on cb.id = so.pay_id where cb.user_id = #{id} and
+        cb.bill_type = 1 and so.finish_flag = 1) AS sumMoney
+    </select>
+
+    <select id="getRechargeType" parameterType="java.lang.Integer"
+            resultType="com.ryit.commons.entity.pojo.CreditRecharge">
+        select id,money,gift,recharge_type AS rechargeType from credit_recharge
+        where recharge_type = #{num} ORDER BY money
+    </select>
+
+    <select id="getRecharge" resultType="com.ryit.commons.entity.pojo.CreditRecharge">
+        select id,money,gift,recharge_type AS rechargeType from credit_recharge
+        where id = #{id}
+    </select>
+
+    <!--根据订单支付人ID查询账单流水信息 -->
+    <select id="selectPayBill" parameterType="long" resultMap="BaseResultMap">
+        select id,user_id,bill_coin,bill_type,bill_time,coupon_id,bill_money from credit_bill where id = #{payId}
+    </select>
+
+    <!--流水单PC端列表查询-->
+    <select id="selectAllByCondition" parameterType="map" resultType="com.ryit.commons.entity.pojo.CreditBill">
+        SELECT
+        t1.user_id AS userId,
+        t2.user_name AS userName,
+        t1.bill_coin AS billCoin,
+        t1.bill_type AS billType,
+        CASE
+        WHEN t1.bill_type = 0 THEN '充值'
+        WHEN t1.bill_type = 1 THEN '抢单'
+        WHEN t1.bill_type = 2 THEN '退单'
+        END AS billTypeName,
+        t1.bill_time AS billTime,
+        t1.coupon_id AS couponId,
+        t1.bill_money AS billMoney
+        FROM credit_bill t1 LEFT JOIN credit_user t2 ON t1.user_id = t2.id
+        <where>
+            <if test="billType != null">
+                and t1.bill_type = #{billType}
+            </if>
+            <if test="userName != null and userName != ''">
+                and t2.user_name like concat('%',#{userName},'%')
+            </if>
+            <choose>
+                <when test="startTime != null">
+                    and t1.bill_time &gt; #{startTime}
+                </when>
+                <when test="endTime != null">
+                    and t1.bill_time &lt; #{endTime}
+                </when>
+                <when test="startTime != null and endTime != null">
+                    and t1.bill_time between #{startTime} and #{endTime}
+                </when>
+            </choose>
+        </where>
+        order by t1.bill_time desc
+    </select>
+
+    <select id="selectCreditBillStatistics" parameterType="map"
+            resultType="com.ryit.commons.entity.pojo.CreditBillStatistics">
+        SELECT COUNT(1) AS totalCount,
+        SUM(bill_coin) AS totalCoin,
+        SUM(bill_money) AS totalRechargeMoney,
+        bill_type AS billType FROM credit_bill WHERE bill_time BETWEEN STR_TO_DATE(#{startTime},'%Y-%m-%d %H:%i:%s') AND
+        STR_TO_DATE(#{endTime},'%Y-%m-%d %H:%i:%s')
+        GROUP BY bill_type
+    </select>
+
+    <select id="getCreditInvite" resultType="com.ryit.commons.entity.pojo.CreditInvite">
+        select id,coin,num from credit_invite
+    </select>
+
+    <insert id="insertCreditBill" keyColumn="id" keyProperty="id"
+            parameterType="com.ryit.commons.entity.pojo.CreditBill" useGeneratedKeys="true">
+        insert into credit_bill (user_id, bill_coin, bill_type,
+        bill_time,coupon_id,bill_money)
+        values (#{userId}, #{billCoin}, #{billType},
+        sysdate(),#{couponId},#{billMoney})
+    </insert>
+
+    <select id="countGrab" parameterType="java.lang.Long" resultType="java.lang.Integer">
+        select count(1) from credit_bill where user_id = #{userId} and bill_type = 1
+    </select>
+
+</mapper>

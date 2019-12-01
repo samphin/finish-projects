@@ -1,0 +1,105 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ryit.walletproductserver.dao.WalletTagMapper">
+
+    <sql id="allResult">
+        <trim suffixOverrides=",">
+            id,
+            name,
+            code,
+            sort,
+            create_time,
+            del_flag,
+        </trim>
+    </sql>
+
+    <resultMap type="com.ryit.commons.entity.pojo.WalletTag" id="WalletTagMap">
+        <result property="id" column="id"/>
+        <result property="name" column="name"/>
+        <result property="code" column="code"/>
+        <result property="sort" column="sort"/>
+        <result property="createTime" column="create_time"/>
+        <result property="delFlag" column="del_flag"/>
+    </resultMap>
+
+    <insert id="insertWalletTag" useGeneratedKeys="true" keyProperty="id"
+            parameterType="com.ryit.commons.entity.pojo.WalletTag">
+        INSERT INTO wallet_tag
+        (
+        <trim suffixOverrides=",">
+            <if test="id!=null">id,</if>
+            <if test="name!=null">name,</if>
+            <if test="code!=null">code,</if>
+            <if test="sort!=null">sort,</if>
+            <if test="createTime!=null">create_time,</if>
+            <if test="delFlag!=null">del_flag,</if>
+        </trim>
+        )
+        VALUES
+        (
+        <trim suffixOverrides=",">
+            <if test="id!=null">#{id},</if>
+            <if test="name!=null">#{name},</if>
+            <if test="code!=null">#{code},</if>
+            <if test="sort!=null">#{sort},</if>
+            <if test="createTime!=null">#{createTime},</if>
+            <if test="delFlag!=null">#{delFlag},</if>
+        </trim>
+        )
+    </insert>
+
+    <update id="updateWalletTag" parameterType="com.ryit.commons.entity.pojo.WalletTag">
+        UPDATE wallet_tag SET
+        <trim suffixOverrides=",">
+            <if test="name != null and name!=''">name = #{name},</if>
+            <if test="code != null and code!=''">code = #{code},</if>
+            <if test="sort != null">sort = #{sort},</if>
+            <if test="createTime != null">create_time = #{createTime},</if>
+            <if test="delFlag != null and delFlag!=''">del_flag = #{delFlag},</if>
+        </trim>
+        WHERE
+        <trim suffixOverrides="and">id = #{id} and</trim>
+    </update>
+
+    <update id="deleteWalletTag" parameterType="java.lang.Long">
+        UPDATE wallet_tag SET del_flag = '2' WHERE id =#{id} AND del_flag = '0'
+    </update>
+
+    <select id="queryWalletTag" resultMap="WalletTagMap">
+        SELECT
+        <include refid="allResult"/>
+        FROM wallet_tag WHERE del_flag = '0' ORDER BY sort ASC
+    </select>
+
+    <insert id="insertWalletProductTag" parameterType="java.lang.Long">
+        INSERT INTO wallet_product_tag(product_id, tag_id) VALUES
+        <foreach collection="list" item="item" index="index" separator=",">
+            (#{productId}, #{item})
+        </foreach>
+    </insert>
+
+    <delete id="deleteWalletProductTag" parameterType="java.lang.Long">
+        DELETE FROM wallet_product_tag WHERE product_id = #{productId} AND tag_id IN
+        <foreach collection="list" item="item" index="index" open="(" separator="," close=")">
+            #{item}
+        </foreach>
+    </delete>
+
+    <select id="queryByProductId" resultMap="WalletTagMap" parameterType="java.lang.Long">
+        SELECT wt.id, wt.name, wt.code
+        FROM wallet_tag wt
+        LEFT JOIN wallet_product_tag wpt ON wt.id = wpt.tag_id
+        WHERE wt.del_flag = '0' AND wpt.product_id =#{productId}
+    </select>
+
+    <select id="queryTagIdByProductId" resultType="java.lang.Long">
+        SELECT tag_id FROM wallet_product_tag WHERE product_id = #{productId}
+    </select>
+
+    <select id="queryTagById" resultMap="WalletTagMap" parameterType="java.lang.Long">
+        SELECT
+        <include refid="allResult"/>
+        FROM wallet_tag WHERE id =#{id} AND del_flag = '0'
+    </select>
+
+</mapper>

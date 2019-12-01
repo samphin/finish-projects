@@ -1,0 +1,17 @@
+spring:
+  application:
+    name: credit-api-gateway
+server:
+  port: 8088
+eureka:
+  client:
+    service-url:
+      defaultZone: http://root:root@zone2:8081/eureka,http://root:root@zone1:8080/eureka
+zuul:
+  ignored-services: credit-web-server,quartz-server,solr-server,wallet-user-server,wallet-api-server,wallet-web-server,wallet-market-server,wallet-news-server,wallet-product-server
+#默认全拦截Cookie,Set-Cookie,Authorization
+#仅过滤掉Cookie,Set-Cookie使Authorization通行
+#  sensitive-headers: Cookie,Set-Cookie
+  host:
+    connect-timeout-millis: 15000 #HTTP连接超时要比Hystrix的大
+    socket-timeout-millis: 60000   #socket超时

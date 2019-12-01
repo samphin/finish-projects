@@ -1,0 +1,45 @@
+spring:
+  application:
+    name: message-server
+server:
+  port: 8082
+eureka:
+  client:
+    service-url:
+      defaultZone: http://root:root@zone2:8081/eureka,http://root:root@zone1:8080/eureka
+
+sms:
+  # 验证码长度
+  length: 4
+  # 验证码有效期（秒）
+  time: 300
+  aliyun:
+    SignName: 柚子抢单
+    TemplateCode: SMS_172884873
+
+jpush:
+  credit:
+    masterSecret: 42eac727223bbb45a85092d2
+    appKey: e471bb0eeb30d85093663955
+  wallet:
+    masterSecret: 42eac727223bbb45a85092d2
+    appKey: e471bb0eeb30d85093663955
+
+aliyun:
+  accessKeyId: LTAISA6Zaiv6F3oU
+  accessKeySecret: iIay5XZ3LQDNK7lTVcxDfxJHVpo31s
+
+oss:
+  endpoint: https://oss-cn-shenzhen.aliyuncs.com
+  bucketName: youziqiangdan-app
+  fileLink: https://youziqiangdan-app.oss-cn-shenzhen.aliyuncs.com/
+
+smsChinese:
+  uid: 71钱包
+  key: d41d8cd98f00b204e980
+
+wxshare:
+  appId: wxdaca41fd5f1fc822
+  secret: 2f25e8ca10fa08fb53c5131af8d76e4c
+
+

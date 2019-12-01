@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ryit.orderserver.dao.AreaMapper">
+    <select id="getAreaList" resultType="com.ryit.commons.entity.pojo.SysArea">
+        select code,area_name AS areaName,`level`,parent_code AS parentCode
+        from sys_area
+    </select>
+
+    <!--根据code查询城市名称-->
+    <select id="selectNameByCode" parameterType="integer" resultType="string">
+        select area_name AS areaName from sys_area where code = #{code}
+    </select>
+</mapper>

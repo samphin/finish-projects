@@ -1,0 +1,82 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ryit.credituserserver.dao.CreditMenuMapper">
+
+    <select id="getAllCreditMenu" resultType="com.ryit.commons.entity.pojo.CreditMenu">
+        select
+            menu_id as menuId,
+            menu_name as menuName,
+            parent_id as parentId,
+            order_num as orderNum,
+            url,
+            menu_type as menuType,
+            visible,
+            perms,
+            icon
+        FROM credit_menu where visible = 0 order by order_num DESC
+    </select>
+
+    <select id="getUserCreditMenu" parameterType="java.lang.Long"
+            resultType="com.ryit.commons.entity.pojo.CreditMenu">
+          select
+            m.menu_id as menuId,
+            m.menu_name as menuName,
+            m.parent_id as parentId,
+            m.order_num as orderNum,
+            m.url,
+            m.menu_type as menuType,
+            m.visible,
+            m.perms,
+            m.icon
+        FROM credit_user_role ur
+        LEFT JOIN  credit_role_menu rm on rm.role_id = ur.role_id
+        LEFT JOIN credit_menu m on m.menu_id = rm.menu_id
+        where m.visible = 0 and ur.user_id = #{userId}
+    </select>
+
+    <insert id="addCreditMenu" parameterType="com.ryit.commons.entity.pojo.CreditMenu" >
+          insert into credit_menu (
+              menu_name,parent_id,order_num,url,menu_type,visible,perms,icon
+          )values (
+              #{menuName}, #{parentId}, #{orderNum}, #{orderNum}, #{menuType}, #{visible}, #{perms}, #{icon}
+          )
+    </insert>
+
+
+   <update id="editCreditMenu" parameterType="com.ryit.commons.entity.pojo.CreditMenu">
+          update credit_menu
+          <set>
+              <if test="menuName != null and menuName != ''"> menu_name = #{menuName},</if>
+              <if test="orderNum != null"> order_num = #{orderNum},</if>
+              <if test="menuType != null and menuType != ''"> menu_name = #{menuType},</if>
+              <if test="icon != null and icon != ''"> icon = #{icon},</if>
+              <if test="visible != null and visible != ''"> visible = #{visible},</if>
+              <if test="perms != null and perms != ''"> perms = #{perms},</if>
+          </set>
+         where menu_id = #{menuId}
+   </update>
+
+    <delete id="deleteCreditMenu" parameterType="java.lang.Long">
+            delete from credit_menu where menu_id = #{menuId}
+    </delete>
+
+    <select id="getCreditMenuByParentId" parameterType="java.lang.Long"
+            resultType="com.ryit.commons.entity.pojo.CreditMenu">
+        select
+            menu_id as menuId,
+            menu_name as menuName,
+            parent_id as parentId,
+            order_num as orderNum,
+            url,
+            menu_type as menuType,
+            visible,
+            perms,
+            icon
+        FROM credit_menu
+        where visible = 0 and parent_id = #{menuId}
+    </select>
+
+
+</mapper>
