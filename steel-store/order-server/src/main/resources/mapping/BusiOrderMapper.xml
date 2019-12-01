@@ -1,0 +1,232 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ryit.order.mapper.BusiOrderMapper">
+    <resultMap id="BaseResultMap" type="com.ryit.commons.entity.pojo.BusiOrder">
+        <id column="id" jdbcType="BIGINT" property="id"/>
+        <result column="order_no" jdbcType="VARCHAR" property="orderNo"/>
+        <result column="org_id" jdbcType="INTEGER" property="orgId"/>
+        <result column="status" jdbcType="TINYINT" property="status"/>
+        <result column="type" jdbcType="TINYINT" property="type"/>
+        <result column="pickinstore_type" jdbcType="TINYINT" property="pickinstoreType"/>
+        <result column="logistics_status" jdbcType="TINYINT" property="logisticsStatus"/>
+        <result column="pay_status" jdbcType="TINYINT" property="payStatus"/>
+        <result column="delivery_id" jdbcType="BIGINT" property="deliveryId"/>
+        <result column="logistics_id" jdbcType="VARCHAR" property="logisticsId"/>
+        <result column="logistics_code" jdbcType="VARCHAR" property="logisticsCode"/>
+        <result column="logistics_name" jdbcType="VARCHAR" property="logisticsName"/>
+        <result column="logistics_no" jdbcType="VARCHAR" property="logisticsNo"/>
+        <result column="pay_code" jdbcType="VARCHAR" property="payCode"/>
+        <result column="pay_name" jdbcType="VARCHAR" property="payName"/>
+        <result column="invoice_type" jdbcType="TINYINT" property="invoiceType"/>
+        <result column="invoice_title" jdbcType="VARCHAR" property="invoiceTitle"/>
+        <result column="company_name" jdbcType="VARCHAR" property="companyName"/>
+        <result column="tax_code" jdbcType="VARCHAR" property="taxCode"/>
+        <result column="email" jdbcType="VARCHAR" property="email"/>
+        <result column="goods_price" jdbcType="DOUBLE" property="goodsPrice"/>
+        <result column="postage" jdbcType="DOUBLE" property="postage"/>
+        <result column="use_money" jdbcType="DOUBLE" property="useMoney"/>
+        <result column="coupon_price" jdbcType="DOUBLE" property="couponPrice"/>
+        <result column="order_amount" jdbcType="DOUBLE" property="orderAmount"/>
+        <result column="total_amount" jdbcType="DOUBLE" property="totalAmount"/>
+        <result column="logistics_time" jdbcType="TIMESTAMP" property="logisticsTime"/>
+        <result column="confirm_time" jdbcType="TIMESTAMP" property="confirmTime"/>
+        <result column="pay_time" jdbcType="TIMESTAMP" property="payTime"/>
+        <result column="pick_code" jdbcType="VARCHAR" property="pickCode"/>
+        <result column="order_prom_id" jdbcType="VARCHAR" property="orderPromId"/>
+        <result column="order_prom_amount" jdbcType="DOUBLE" property="orderPromAmount"/>
+        <result column="discount" jdbcType="DOUBLE" property="discount"/>
+        <result column="user_note" jdbcType="VARCHAR" property="userNote"/>
+        <result column="del_status" jdbcType="TINYINT" property="delStatus"/>
+        <result column="pick_status" jdbcType="TINYINT" property="pickStatus"/>
+        <result column="version" jdbcType="INTEGER" property="version"/>
+        <result column="create_user_id" jdbcType="INTEGER" property="createUserId"/>
+        <result column="create_date" jdbcType="TIMESTAMP" property="createDate"/>
+        <result column="last_update_user_id" jdbcType="INTEGER" property="lastUpdateUserId"/>
+        <result column="last_update_date" jdbcType="TIMESTAMP" property="lastUpdateDate"/>
+    </resultMap>
+    <sql id="Base_Column_List">
+    id, order_no, org_id, `status`, `type`, pickinstore_type, logistics_status, pay_status,
+    delivery_id, logistics_id, logistics_code, logistics_name, logistics_no, pay_code,
+    pay_name, invoice_type, invoice_title, company_name, tax_code, email, goods_price,
+    postage, use_money, coupon_price, order_amount, total_amount, logistics_time,
+    confirm_time, pay_time, pick_code, order_prom_id, order_prom_amount, discount, user_note,
+    del_status, pick_status, version, create_user_id, create_date, last_update_user_id, last_update_date
+  </sql>
+
+    <!--查询订单列表-->
+    <select id="selectOrderList" parameterType="com.ryit.commons.entity.dto.BusiOrderQueryDto"
+            resultType="com.ryit.commons.entity.vo.BusiOrderListVo">
+        SELECT
+        bo.id,
+        bo.order_no AS orderNo,
+        bo.status,
+        bo.`type`,
+        bo.pickinstore_type AS pickinstoreType,
+        bo.logistics_status AS logisticsStatus,
+        bo.pay_status AS payStatus,
+        bo.pay_name AS payName,
+        bo.pay_time AS payTime,
+        bo.order_amount AS orderAmount,
+        bo.total_amount AS totalAmount,
+        bo.logistics_time AS logisticsTime,
+        bo.confirm_time AS confirmTime,
+        bo.user_note AS userNote,
+        bo.pick_status AS pickStatus,
+        bog.goods_id AS goodsId,
+        bog.goods_name AS goodsName,
+        bog.goods_img AS goodsImg,
+        bgk.length,
+        bgk.width,
+        bgk.weight,
+        bgk.amount,
+        bgk.price,
+        bgk.`total_price` AS totalPrice,
+        su.real_name AS createUserName,
+        bo.create_date AS createDate
+        FROM busi_order bo
+        LEFT JOIN busi_order_goods bog ON bo.id = bog.order_id
+        LEFT JOIN busi_goods_sku bgk ON bog.sku_id = bgk.id
+        LEFT JOIN sys_user su ON bo.create_user_id = su.id
+        <where>
+            bo.del_status = 0
+            <if test="createUserId != null">
+                and bo.create_user_id = #{createUserId,jdbcType=INTEGER}
+            </if>
+            <if test="status != null">
+                and bo.status = #{status}
+            </if>
+            <if test="orderNo !=null">
+                and bo.order_no = #{orderNo,jdbcType=VARCHAR}
+            </if>
+            <if test="createStartDate != null and createEndDate != null">
+                and bo.create_date between #{createStartDate} and #{createEndDate}
+            </if>
+            <if test="amountMin != null and amountMax != null">
+                and o.total_amount between #{amountMin} and #{amountMax}
+            </if>
+            <if test="certificateStatus != null">
+                and bo.certificate_status = #{certificateStatus,jdbcType=INTEGER}
+            </if>
+            <if test="pickinstoreType != null">
+                and bo.pickinstore_type = #{pickinstoreType,jdbcType=INTEGER}
+            </if>
+            <if test="logisticsStatus != null">
+                and bo.logistics_status = #{logisticsStatus,jdbcType=INTEGER}
+            </if>
+            <if test="payStatus != null">
+                and bo.pay_status = #{payStatus,jdbcType=INTEGER}
+            </if>
+            <if test="logisticsName != null and logisticsName != ''">
+                and bo.logistics_name like concat('%',#{logisticsName,jdbcType=VARCHAR},'%')
+            </if>
+            <if test="logisticsNo != null ">
+                and bo.logistics_no = #{logisticsNo,jdbcType=VARCHAR}
+            </if>
+            <if test="invoiceType != null ">
+                and bo.invoice_type = #{invoiceType,jdbcType=INTEGER}
+            </if>
+            <if test="payTime != null">
+                and bo.pay_time = #{payTime,jdbcType=TIMESTAMP}
+            </if>
+            <if test="userNote != null">
+                and bo.user_note like concat('%',#{userNote,jdbcType=VARCHAR},'%')
+            </if>
+            <if test="pickStatus != null">
+                and bo.pick_status = #{pickStatus,jdbcType=INTEGER}
+            </if>
+        </where>
+    </select>
+
+    <!--查询和我一起拼单的用户下单信息-->
+    <select id="selectMyGroupOrderList" resultType="com.ryit.commons.entity.vo.BusiOrderListVo">
+        SELECT
+        bo.id,
+        bo.order_no AS orderNo,
+        bo.status,
+        bo.`type`,
+        bo.pickinstore_type AS pickinstoreType,
+        bo.logistics_status AS logisticsStatus,
+        bo.pay_status AS payStatus,
+        bo.pay_name AS payName,
+        bo.pay_time AS payTime,
+        bo.order_amount AS orderAmount,
+        bo.total_amount AS totalAmount,
+        bo.logistics_time AS logisticsTime,
+        bo.confirm_time AS confirmTime,
+        bo.user_note AS userNote,
+        bo.pick_status AS pickStatus,
+        su.real_name AS createUserName,
+        bo.create_date AS createDate,
+        bog.goods_id AS goodsId,
+        bog.goods_name AS goodsName,
+        bog.goods_img AS goodsImg,
+        bgk.length,
+        bgk.width,
+        bgk.thickness,
+        bgk.weight,
+        bgk.amount,
+        bgk.price,
+        bgk.total_price as totalPrice
+        FROM busi_order bo
+        LEFT JOIN busi_order_goods bog ON bo.id = bog.order_id
+        LEFT JOIN busi_goods_sku bgk ON bog.sku_id = bgk.id
+        LEFT JOIN sys_user su ON bo.create_user_id = su.id
+        where bog.goods_id = #{goodsId,jdbcType=BIGINT} and
+        <![CDATA[ DATE_FORMAT(bo.create_date, '%Y-%m-%d %H:%i:%S') <= DATE_FORMAT(#{createDate,jdbcType=TIMESTAMP}, '%Y-%m-%d %H:%i:%S')]]>
+        order by bo.create_date desc
+        limit 0,3
+    </select>
+
+    <!--查询订单详情-->
+    <select id="selectOrderDetail" parameterType="long" resultType="com.ryit.commons.entity.vo.BusiOrderDetailVo">
+        select
+        bo.id,
+        bo.order_no as orderNo,
+        bo.status,
+        bo.`type`,
+        bo.pickinstore_type as pickinstoreType,
+        bo.logistics_status as logisticsStatus,
+        bo.pay_status as payStatus,
+        bo.pay_name as payName,
+        bo.pay_time as payTime,
+        bo.order_amount as orderAmount,
+        bo.total_amount as totalAmount,
+        bo.logistics_id as logisticsId,
+        bo.logistics_code as logisticsCode,
+        bo.logistics_name as logisticsName,
+        bo.logistics_no as logisticsNo,
+        bo.logistics_time as logisticsTime,
+        bo.confirm_time as confirmTime,
+        bo.user_note as userNote,
+        bo.pick_status as pickStatus,
+        bo.create_date as createDate
+        from busi_order bo
+        where bo.del_status = 0 and bo.id = #{id}
+    </select>
+
+    <!--统计订单营业额-->
+    <select id="selectTurnover" parameterType="com.ryit.commons.entity.dto.BusiOrderStatisticDto" resultType="double">
+        SELECT SUM(total_amount) AS totalTurnover FROM busi_order
+        <where>
+            pay_status = 1
+            <if test="code != null ">
+                <if test="code == 'year'">
+                    and DATE_FORMAT(SYSDATE(),'%Y') = DATE_FORMAT(create_date,'%Y')
+                </if>
+                <if test="code == 'month'">
+                    and DATE_FORMAT(SYSDATE(),'%Y-%m') = DATE_FORMAT(create_date,'%Y-%m')
+                </if>
+                <if test="code == 'day'">
+                    and DATE_FORMAT(SYSDATE(),'%Y-%m-%d') = DATE_FORMAT(create_date,'%Y-%m-%d')
+                </if>
+            </if>
+            <if test="startDate != null and endDate != null">
+                and create_date between #{startDate} and #{endDate}
+            </if>
+        </where>
+    </select>
+
+    <select id="selectOrderNumsByUserId" parameterType="integer" resultType="integer">
+        select count(id) from busi_order where create_user_id = #{userId,jdbcType=INTEGER} and del_status = 0
+    </select>
+</mapper>

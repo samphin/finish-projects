@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.ryit.users.mapper.SysMenuMapper">
+    <resultMap id="BaseResultMap" type="com.ryit.commons.entity.pojo.SysMenu">
+        <id column="id" jdbcType="INTEGER" property="id" />
+        <result column="parent_id" jdbcType="INTEGER" property="parentId" />
+        <result column="name" jdbcType="VARCHAR" property="name" />
+        <result column="url" jdbcType="VARCHAR" property="url" />
+        <result column="icon" jdbcType="VARCHAR" property="icon" />
+        <result column="sort" jdbcType="INTEGER" property="sort" />
+        <result column="level" jdbcType="SMALLINT" property="level" />
+        <result column="leaf" jdbcType="BOOLEAN" property="leaf" />
+        <result column="enabled" jdbcType="BOOLEAN" property="enabled" />
+        <result column="type" jdbcType="VARCHAR" property="type" />
+        <result column="version" jdbcType="INTEGER" property="version" />
+        <result column="description" jdbcType="VARCHAR" property="description" />
+        <result column="create_user_id" jdbcType="INTEGER" property="createUserId" />
+        <result column="create_date" jdbcType="TIMESTAMP" property="createDate" />
+        <result column="last_update_user_id" jdbcType="INTEGER" property="lastUpdateUserId" />
+        <result column="last_update_date" jdbcType="TIMESTAMP" property="lastUpdateDate" />
+    </resultMap>
+    <sql id="Base_Column_List">
+        id, parent_id, `name`, url, icon, sort, `level`, leaf, enabled, `type`, version,
+        description, create_user_id, create_date, last_update_user_id, last_update_date
+    </sql>
+
+    <select id="selectList" parameterType="com.ryit.commons.entity.pojo.SysMenu" resultMap="BaseResultMap">
+        select
+        <include refid="Base_Column_List"/>
+        from sys_menu
+        <where>
+            <if test="name!=null and name != ''">
+                AND `name` like concat('%',#{name,jdbcType=VARCHAR},'%')
+            </if>
+            <if test="enabled!=null">
+                AND enabled = #{enabled}
+            </if>
+            <if test="level!=null">
+                AND level = #{level,jdbcType=VARCHAR}
+            </if>
+        </where>
+        order by sort
+    </select>
+
+    <select id="selectButtonsByMenuId" parameterType="integer" resultMap="BaseResultMap">
+        select
+        <include refid="Base_Column_List"/>
+        from sys_menu where parent_id = #{menuId,jdbcType=INTEGER}
+    </select>
+
+    <select id="selectUserHaveMenus" parameterType="integer" resultMap="BaseResultMap">
+        SELECT sm.id, sm.parent_id, sm.`name`, sm.url, sm.icon, sm.sort, sm.`level`, sm.leaf,sm.`type`, sm.enabled,
+        sm.description
+        FROM sys_menu sm
+        LEFT JOIN sys_permission_resource_pk spr ON sm.id = spr.resource_id
+        WHERE spr.permission_id IN (
+        SELECT DISTINCT sp.id FROM sys_permission sp LEFT JOIN sys_role_permission_pk srp ON sp.id = srp.permission_id
+        WHERE srp.role_id IN (
+        SELECT DISTINCT t1.id FROM sys_role t1
+        LEFT JOIN sys_user_role_pk t2 ON t1.id = t2.role_id
+        WHERE t1.status = 1 AND t2.user_id = #{userId,jdbcType=INTEGER}
+        ) AND sp.`status` = 1
+        ) AND sm.enabled = 1
+        ORDER BY sm.`sort`
+    </select>
+</mapper>

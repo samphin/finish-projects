@@ -1,0 +1,20 @@
+spring:
+  application:
+    name: quartz-server
+server:
+  port: 8085
+eureka:
+  client:
+    service-url:
+      defaultZone: http://zone:8080/eureka,http://zone1:8081/eureka
+
+#定时任务配置
+schedule:
+  job:
+    #最小任务线程个数
+    corePoolSize: 3
+    #最大线程个数
+    maxPoolSize: 10
+    #等待队列大小
+    queueCapacity: 30
+

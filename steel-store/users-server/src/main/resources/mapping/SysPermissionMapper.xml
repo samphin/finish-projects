@@ -1,0 +1,69 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.ryit.users.mapper.SysPermissionMapper">
+    <resultMap id="BaseResultMap" type="com.ryit.commons.entity.pojo.SysPermission">
+        <id column="id" jdbcType="INTEGER" property="id" />
+        <result column="name" jdbcType="VARCHAR" property="name" />
+        <result column="code" jdbcType="VARCHAR" property="code" />
+        <result column="description" jdbcType="VARCHAR" property="description" />
+        <result column="status" jdbcType="BOOLEAN" property="status" />
+        <result column="version" jdbcType="SMALLINT" property="version" />
+        <result column="create_user_id" jdbcType="INTEGER" property="createUserId" />
+        <result column="create_date" jdbcType="TIMESTAMP" property="createDate" />
+        <result column="last_update_user_id" jdbcType="INTEGER" property="lastUpdateUserId" />
+        <result column="last_update_date" jdbcType="TIMESTAMP" property="lastUpdateDate" />
+    </resultMap>
+    <sql id="Base_Column_List">
+        id, `name`, code, description, `status`, version, create_user_id, create_date, last_update_user_id,
+        last_update_date
+    </sql>
+
+    <!--查询角色已拥有的权限-->
+    <select id="selectRoleHavePermissions" parameterType="java.lang.Integer" resultMap="BaseResultMap">
+        select t1.id,t1.name,t1.code,t1.status FROM sys_permission t1 inner join sys_role_permission_pk t2 on t1.id =
+        t2.permission_id
+        where t1.status = 1 and t2.role_id = #{roleId,jdbcType=INTEGER}
+    </select>
+
+    <select id="selectList" parameterType="com.ryit.commons.entity.pojo.SysPermission" resultMap="BaseResultMap">
+        select
+        <include refid="Base_Column_List"/>
+        from sys_permission
+        <where>
+            <if test="name != null and name != ''">
+                `name` like concat('%',#{name,jdbcType=VARCHAR},'%')
+            </if>
+            <if test="code != null and code != ''">
+                and `code` like concat('%',#{code,jdbcType=VARCHAR},'%')
+            </if>
+            <if test="description != null and description != ''">
+                and `description` like concat('%',#{description,jdbcType=VARCHAR},'%')
+            </if>
+            <if test="status != null">
+                and `status` = #{status}
+            </if>
+        </where>
+    </select>
+
+    <!--查询角色未拥有的权限-->
+    <select id="selectRoleHaveNoPermissions" resultMap="BaseResultMap">
+        select t1.id,t1.name,t1.code,t1.status FROM sys_permission t1 left join sys_role_permission_pk t2 on t1.id !=
+        t2.permission_id
+        <where>
+            t1.status = 1 and t2.role_id != #{roleId,jdbcType=INTEGER} or t2.role_id is null
+            <if test="name!='' and name != null">
+                and t1.name like concat('%', #{name,jdbcType=VARCHAR}, '%')
+            </if>
+        </where>
+    </select>
+
+    <!--查询角色对应所有权限信息-->
+    <select id="selectPermissionsByRoleIds" parameterType="long" resultType="string">
+        select distinct sp.code from sys_role_permission_pk spk
+        left join sys_permission sp on spk.permission_id = sp.id
+        where spk.role_id in
+        <foreach collection="list" item="roleId" index="index" separator="," open="(" close=")">
+            ${roleId}
+        </foreach>
+    </select>
+</mapper>

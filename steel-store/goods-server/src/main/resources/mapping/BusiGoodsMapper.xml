@@ -1,0 +1,178 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ryit.goods.mapper.BusiGoodsMapper">
+    <resultMap id="BaseResultMap" type="com.ryit.commons.entity.pojo.BusiGoods">
+        <id column="id" jdbcType="BIGINT" property="id"/>
+        <result column="org_id" jdbcType="BIGINT" property="orgId"/>
+        <result column="brand_id" jdbcType="INTEGER" property="brandId"/>
+        <result column="shape_code" jdbcType="TINYINT" property="shapeCode"/>
+        <result column="name" jdbcType="VARCHAR" property="name"/>
+        <result column="title" jdbcType="VARCHAR" property="title"/>
+        <result column="subhead" jdbcType="VARCHAR" property="subhead"/>
+        <result column="description" jdbcType="VARCHAR" property="description"/>
+        <result column="cost_price" jdbcType="DECIMAL" property="costPrice"/>
+        <result column="market_price" jdbcType="DECIMAL" property="marketPrice"/>
+        <result column="discount_price" jdbcType="DECIMAL" property="discountPrice"/>
+        <result column="stock_nums" jdbcType="INTEGER" property="stockNums"/>
+        <result column="sort" jdbcType="INTEGER" property="sort"/>
+        <result column="default_thickness" jdbcType="INTEGER" property="defaultThickness"/>
+        <result column="default_width" jdbcType="DECIMAL" property="defaultWidth"/>
+        <result column="recommend_status" jdbcType="TINYINT" property="recommendStatus"/>
+        <result column="new_status" jdbcType="TINYINT" property="newStatus"/>
+        <result column="hot_status" jdbcType="TINYINT" property="hotStatus"/>
+        <result column="postage_des" jdbcType="VARCHAR" property="postageDes"/>
+        <result column="postage_price" jdbcType="DECIMAL" property="postagePrice"/>
+        <result column="free_shipping_status" jdbcType="TINYINT" property="freeShippingStatus"/>
+        <result column="service_des" jdbcType="VARCHAR" property="serviceDes"/>
+        <result column="param_des" jdbcType="VARCHAR" property="paramDes"/>
+        <result column="shelf_status" jdbcType="TINYINT" property="shelfStatus"/>
+        <result column="img_path" jdbcType="VARCHAR" property="imgPath"/>
+        <result column="visit" jdbcType="INTEGER" property="visit"/>
+        <result column="point_num" jdbcType="INTEGER" property="pointNum"/>
+        <result column="collection_num" jdbcType="INTEGER" property="collectionNum"/>
+        <result column="commission" jdbcType="DECIMAL" property="commission"/>
+        <result column="commission_perct" jdbcType="DECIMAL" property="commissionPerct"/>
+        <result column="comment_count" jdbcType="INTEGER" property="commentCount"/>
+        <result column="sale" jdbcType="INTEGER" property="sale"/>
+        <result column="status" jdbcType="TINYINT" property="status"/>
+        <result column="name_spell" jdbcType="VARCHAR" property="nameSpell"/>
+        <result column="name_simple_spell" jdbcType="VARCHAR" property="nameSimpleSpell"/>
+        <result column="create_user_id" jdbcType="INTEGER" property="createUserId"/>
+        <result column="create_date" jdbcType="TIMESTAMP" property="createDate"/>
+        <result column="last_update_user_id" jdbcType="INTEGER" property="lastUpdateUserId"/>
+        <result column="last_update_date" jdbcType="TIMESTAMP" property="lastUpdateDate"/>
+        <result column="version" jdbcType="INTEGER" property="version"/>
+    </resultMap>
+    <sql id="Base_Column_List">
+        id, org_id, brand_id, shape_code, `name`, title, subhead, description, cost_price,
+        market_price, discount_price, stock_nums, sort, default_thickness, default_width,
+        recommend_status, new_status, hot_status, postage_des, postage_price, free_shipping_status,
+        service_des, param_des, shelf_status, img_path, visit, point_num, collection_num,
+        commission, commission_perct, comment_count, sale, `status`, name_spell, name_simple_spell,
+        create_user_id, create_date, last_update_user_id, last_update_date, version
+    </sql>
+
+    <select id="selectAppGoodsList"
+            parameterType="com.ryit.commons.entity.dto.BusiGoodsQueryDto"
+            resultType="com.ryit.commons.entity.vo.BusiGoodsAppListVo">
+        select
+        bg.id,
+        bg.`name`,
+        bg.img_path as imgPath,
+        bg.market_price as marketPrice,
+        bg.discount_price as discountPrice,
+        bg.cost_price as costPrice,
+        bg.default_thickness as defaultThickness,
+        bg.sort,
+        bg.brand_id as brandId,
+        bgs.name as shapeName
+        from busi_goods bg
+        left join busi_goods_shape bgs on bg.shape_code = bgs.code
+        <where>
+            bg.shelf_status = 1
+            <if test="brandId != null">
+                and bg.brand_id = #{brandId,jdbcType=BIGINT}
+            </if>
+            <if test="shapeCode != null">
+                and bg.shape_code = #{shapeCode,jdbcType=INTEGER}
+            </if>
+            <if test="thicknessMin != null and thicknessMax != null">
+                and
+                <![CDATA[ bg.default_thickness >= #{thicknessMin,jdbcType=INTEGER} and bg.default_thickness < #{thicknessMax,jdbcType=INTEGER} ]]>
+            </if>
+        </where>
+        order by bg.create_date desc,bg.sort
+    </select>
+
+    <select id="selectGoodsList"
+            parameterType="com.ryit.commons.entity.dto.BusiGoodsPcQueryDto"
+            resultType="com.ryit.commons.entity.pojo.BusiGoods">
+        select
+        <include refid="Base_Column_List"/>
+        from busi_goods
+        <where>
+            <if test="brandId != null">
+                brand_id = #{brandId,jdbcType=BIGINT},
+            </if>
+            <if test="shapeCode != null">
+                shape_code = #{shapeCode,jdbcType=TINYINT},
+            </if>
+            <if test="name != null">
+                `name` like concat('%',#{name,jdbcType=VARCHAR},'%'),
+            </if>
+            <if test="title != null">
+                title like concat('%',#{title,jdbcType=VARCHAR},'%'),
+            </if>
+            <if test="subhead != null">
+                subhead like concat('%',#{subhead,jdbcType=VARCHAR},'%'),
+            </if>
+            <if test="description != null">
+                description like concat('%',#{description,jdbcType=VARCHAR},'%'),
+            </if>
+            <if test="costPrice != null">
+                cost_price = #{costPrice,jdbcType=DOUBLE},
+            </if>
+            <if test="marketPrice != null">
+                market_price = #{marketPrice,jdbcType=DOUBLE},
+            </if>
+            <if test="discountPrice != null">
+                discount_price = #{discountPrice,jdbcType=DOUBLE},
+            </if>
+            <if test="stockNums != null">
+                stock_nums = #{stockNums,jdbcType=INTEGER},
+            </if>
+            <if test="thicknessMin != null and thicknessMax != null">
+                and default_thickness between #{thicknessMin,jdbcType=INTEGER} and #{thicknessMax,jdbcType=INTEGER}
+            </if>
+            <if test="recommendStatus != null">
+                recommend_status = #{recommendStatus,jdbcType=TINYINT},
+            </if>
+            <if test="newStatus != null">
+                new_status = #{newStatus,jdbcType=TINYINT},
+            </if>
+            <if test="hotStatus != null">
+                hot_status = #{hotStatus,jdbcType=TINYINT},
+            </if>
+            <if test="postageDes != null">
+                postage_des = #{postageDes,jdbcType=VARCHAR},
+            </if>
+            <if test="postagePrice != null">
+                postage_price = #{postagePrice,jdbcType=DOUBLE},
+            </if>
+            <if test="freeShippingStatus != null">
+                free_shipping_status = #{freeShippingStatus,jdbcType=TINYINT},
+            </if>
+            <if test="shelfStatus != null">
+                shelf_status = #{shelfStatus,jdbcType=TINYINT},
+            </if>
+            <if test="imgPath != null">
+                img_path = #{imgPath,jdbcType=VARCHAR},
+            </if>
+            <if test="visit != null">
+                visit = #{visit,jdbcType=INTEGER},
+            </if>
+            <if test="pointNum != null">
+                point_num = #{pointNum,jdbcType=INTEGER},
+            </if>
+            <if test="collectionNum != null">
+                collection_num = #{collectionNum,jdbcType=INTEGER},
+            </if>
+            <if test="commentCount != null">
+                comment_count = #{commentCount,jdbcType=INTEGER},
+            </if>
+            <if test="sale != null">
+                sale = #{sale,jdbcType=INTEGER},
+            </if>
+            <if test="status != null">
+                `status` = #{status,jdbcType=TINYINT},
+            </if>
+            <if test="nameSpell != null">
+                name_spell = #{nameSpell,jdbcType=VARCHAR},
+            </if>
+            <if test="nameSimpleSpell != null">
+                name_simple_spell = #{nameSimpleSpell,jdbcType=VARCHAR},
+            </if>
+        </where>
+        order by create_date desc,sort
+    </select>
+</mapper>

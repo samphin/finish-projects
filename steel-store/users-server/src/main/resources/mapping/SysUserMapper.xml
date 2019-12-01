@@ -1,0 +1,110 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.ryit.users.mapper.SysUserMapper">
+    <resultMap id="BaseResultMap" type="com.ryit.commons.entity.pojo.SysUser">
+        <id column="id" jdbcType="INTEGER" property="id" />
+        <result column="username" jdbcType="VARCHAR" property="username" />
+        <result column="avatar" jdbcType="VARCHAR" property="avatar" />
+        <result column="password" jdbcType="VARCHAR" property="password" />
+        <result column="real_name" jdbcType="VARCHAR" property="realName" />
+        <result column="sex" jdbcType="TINYINT" property="sex" />
+        <result column="birthday" jdbcType="DATE" property="birthday" />
+        <result column="email" jdbcType="VARCHAR" property="email" />
+        <result column="mobile_phone" jdbcType="VARCHAR" property="mobilePhone" />
+        <result column="id_card" jdbcType="VARCHAR" property="idCard" />
+        <result column="del_flag" jdbcType="TINYINT" property="delFlag" />
+        <result column="status" jdbcType="TINYINT" property="status" />
+        <result column="login_status" jdbcType="BOOLEAN" property="loginStatus" />
+        <result column="login_count" jdbcType="INTEGER" property="loginCount" />
+        <result column="last_login_date" jdbcType="TIMESTAMP" property="lastLoginDate" />
+        <result column="version" jdbcType="INTEGER" property="version" />
+        <result column="tenant_id" jdbcType="VARCHAR" property="tenantId" />
+        <result column="province" jdbcType="VARCHAR" property="province" />
+        <result column="city" jdbcType="VARCHAR" property="city" />
+        <result column="address" jdbcType="VARCHAR" property="address" />
+        <result column="create_user_id" jdbcType="INTEGER" property="createUserId" />
+        <result column="create_date" jdbcType="TIMESTAMP" property="createDate" />
+        <result column="last_update_user_id" jdbcType="INTEGER" property="lastUpdateUserId" />
+        <result column="last_update_date" jdbcType="TIMESTAMP" property="lastUpdateDate" />
+    </resultMap>
+    <sql id="Base_Column_List">
+        id, username, avatar, `password`, real_name, sex, birthday, email, mobile_phone,
+        id_card, del_flag, `status`, login_status, login_count, last_login_date, version,
+        tenant_id, province, city, address, create_user_id, create_date, last_update_user_id,
+        last_update_date
+    </sql>
+
+    <sql id="Login_Info_Column_List">
+        id, username, avatar, `password`, real_name, sex, birthday, email, mobile_phone,
+        id_card, del_flag, `status`, login_count,last_login_date, version, tenant_id, province, city,
+        address
+    </sql>
+
+    <select id="selectList" parameterType="com.ryit.commons.entity.pojo.SysUser" resultMap="BaseResultMap">
+        select
+        <include refid="Base_Column_List"/>
+        from sys_user
+        <where>
+            <if test="username!=null and username != ''">
+                AND username like concat('%',#{username,jdbcType=VARCHAR},'%')
+            </if>
+            <if test="realName!=null and realName != ''">
+                AND real_name like concat('%',#{realName,jdbcType=VARCHAR},'%')
+            </if>
+            <if test="sex!=null and sex != ''">
+                AND sex = #{sex,jdbcType=INTEGER}
+            </if>
+            <if test="mobilePhone!=null and mobilePhone != ''">
+                AND mobile_phone like concat('%',#{mobilePhone,jdbcType=VARCHAR},'%')
+            </if>
+            <if test="province != null">
+                AND province = #{province,jdbcType=VARCHAR}
+            </if>
+            <if test="city!=null">
+                AND city = #{city,jdbcType=INTEGER}
+            </if>
+            <if test="idCard!=null and idCard != ''">
+                AND id_card like concat('%',#{idCard,jdbcType=VARCHAR},'%')
+            </if>
+            <if test="status!=null">
+                AND status = #{status,jdbcType=VARCHAR}
+            </if>
+        </where>
+    </select>
+
+    <!--根据手机号查询用户登录信息-->
+    <select id="selectLoginInfoByPhone" parameterType="string" resultMap="BaseResultMap">
+        select
+        <include refid="Login_Info_Column_List"/>
+        from sys_user where mobile_phone = #{mobilePhone}
+    </select>
+
+    <!--校验手机号是否存在-->
+    <select id="selectUserByPhone" parameterType="string" resultType="integer">
+        select count(id) from sys_user where mobile_phone = #{mobilePhone}
+    </select>
+
+    <!--查询买家列表-->
+    <select id="selectBuyers" parameterType="com.ryit.commons.entity.dto.SysBuyerQueryDto"
+            resultType="com.ryit.commons.entity.vo.SysBuyerListVo">
+        SELECT
+        su.id,
+        su.username,
+        su.real_name as realName,
+        su.mobile_phone as mobilePhone
+        FROM sys_user su
+        LEFT JOIN sys_user_role_pk surp ON su.`id` = surp.`user_id`
+        <where>
+            surp.`role_id` = 5
+            <if test="mobilePhone != null and mobilePhone != ''">
+                and su.mobile_phone like concat('%',#{mobilePhone,jdbcType=VARCHAR},'%')
+            </if>
+            <if test="username != null and username != ''">
+                and su.username like concat('%',#{username,jdbcType=VARCHAR},'%')
+            </if>
+            <if test="realName != null and realName != ''">
+                and su.real_name like concat('%',#{realName,jdbcType=VARCHAR},'%')
+            </if>
+        </where>
+    </select>
+</mapper>

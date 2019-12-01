@@ -1,0 +1,11 @@
+server:
+  port: 9070
+eureka:
+  client:
+    service-url:
+      defaultZone: http://root:root@zone:8080/eureka/
+  instance:
+    hostname: ${manager-server}
+spring:
+  application:
+    name: talk-server

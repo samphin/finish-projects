@@ -1,0 +1,116 @@
+server:
+  port: 8088
+eureka:
+  client:
+    service-url:
+      defaultZone: http://zone:8080/eureka,http://zone1:8081/eureka
+
+spring:
+  application:
+    name: api-gateway-server
+  cloud:
+    gateway:
+      #开启服务注册与发现功能
+      discovery:
+        locator:
+          enabled: true
+          #服务注册到eureka后小写显示
+          lower-case-service-id: false
+      filter:
+        remove-non-proxy-headers:
+          headers:
+            - dummy
+      #      default-filters:
+      #        - name: Hystrix
+      #          args:
+      #            name: fallbackcmd
+      #            fallbackUri: forward:/default_fallback
+      #        - name: RequestRateLimiter
+      #          args:
+      #            # 使用SpEL名称引用Bean，匹配RateLimiterConfig配置类中bean的name名称
+      #            key-resolver: '#{@tokenResolver}'
+      #            # 每秒最大访问次数
+      #            redis-rate-limiter.replenishRate: 20
+      #            # 令牌桶最大容量
+      #            redis-rate-limiter.burstCapacity: 20
+      routes:
+        - id: security-server
+          uri: lb://security-server
+          predicates:
+            - Path=/security-server/**
+          filters:
+            - StripPrefix=1
+            - name: Hystrix
+              args:
+                name: fallbackcmd
+                fallbackUri: forward:/default_fallback?module=登录服务
+
+        - id: users-server
+          uri: lb://users-server
+          predicates:
+            - Path=/users-server/**
+          filters:
+            - StripPrefix=1
+            - name: Hystrix
+              args:
+                name: fallbackcmd
+                fallbackUri: forward:/default_fallback?module=用户服务
+
+        - id: order-server
+          uri: lb://order-server
+          predicates:
+            - Path=/order-server/**
+          filters:
+            - StripPrefix=1
+            - name: Hystrix
+              args:
+                name: fallbackcmd
+                fallbackUri: forward:/default_fallback?module=订单服务
+
+        - id: goods-server
+          uri: lb://goods-server
+          predicates:
+            - Path=/goods-server/**
+          filters:
+            - StripPrefix=1
+            - name: Hystrix
+              args:
+                name: fallbackcmd
+                fallbackUri: forward:/default_fallback?module=商品服务
+
+        - id: message-server
+          uri: lb://message-server
+          predicates:
+            - Path=/message-server/**
+          filters:
+            - StripPrefix=1
+            - name: Hystrix
+              args:
+                name: fallbackcmd
+                fallbackUri: forward:/default_fallback?module=消息服务
+
+# hystrix 信号量隔离，3秒后自动超时
+# Hystrix 配置
+hystrix:
+  command:
+    default:
+      execution:
+        isolation:
+          thread:
+            timeoutInMilliseconds: 6000
+    fallbackcmd: # 自定义熔断降级
+      execution:
+        isolation:
+          thread:
+            timeoutInMilliseconds: 20000 # 20s超时时间，测试阶段
+
+logging:
+  level:
+    org.springframework.cloud.gateway: debug
+
+#允许访问的前缀
+allowed-prefix: api,admin
+
+#不进行jwtToken校验的地址
+jwt:
+  ignore-url: /home_page,/login,/register,/unauth,/sms,/druid/**,/actuator/**

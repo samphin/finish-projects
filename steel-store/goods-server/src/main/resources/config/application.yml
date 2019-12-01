@@ -1,0 +1,63 @@
+server:
+  port: 8083
+eureka:
+  client:
+    service-url:
+      defaultZone: http://zone:8080/eureka,http://zone1:8081/eureka
+spring:
+  application:
+    name: goods-server
+  #数据库配置
+  datasource:
+    druid:
+      driver-class-name: com.mysql.cj.jdbc.Driver
+      url: jdbc:mysql://192.168.0.84:3306/steel_store?useUnicode=true&characterEncoding=utf8&zeroDateTimeBehavior=convertToNull&useSSL=true&serverTimezone=GMT%2B8
+      username: root
+      password: wang+123yi
+      # 初始连接数
+      initial-size: 10
+      # 最大连接池数量
+      max-active: 100
+      # 最小连接池数量
+      min-idle: 10
+      # 配置获取连接等待超时的时间
+      max-wait: 60000
+      # 打开PSCache，并且指定每个连接上PSCache的大小
+      pool-prepared-statements: true
+      max-pool-prepared-statement-per-connection-size: 20
+      # 配置间隔多久才进行一次检测，检测需要关闭的空闲连接，单位是毫秒
+      time-between-eviction-runs-millis: 60000
+      # 配置一个连接在池中最小生存的时间，单位是毫秒
+      min-evictable-idle-time-millis: 300000
+      validation-query: SELECT 1 FROM DUAL
+      test-while-idle: true
+      test-on-borrow: false
+      test-on-return: false
+      stat-view-servlet:
+        enabled: true
+        url-pattern: /monitor/druid/*
+      filter:
+        stat:
+          log-slow-sql: true
+          slow-sql-millis: 1000
+          merge-sql: false
+        wall:
+          config:
+            multi-statement-allow: true
+
+#分布式事务
+# 默认之配置为TM的本机默认端口
+# tx-manager 的配置地址，可以指定TM集群中的任何一个或多个地址
+# tx-manager 下集群策略，每个TC都会从始至终<断线重连>与TM集群保持集群大小个连接。
+# TM方，每有TM进入集群，会找到所有TC并通知其与新TM建立连接。
+# TC方，启动时按配置与集群建立连接，成功后，会再与集群协商，查询集群大小并保持与所有TM的连接u
+tx-lcn:
+  client:
+    manager-address: zone:8070
+  # 是否启动LCN负载均衡策略(优化选项，开启与否，功能不受影响)
+  ribbon:
+    loadbalancer:
+      dtx.enabled: true
+  springcloud:
+    loadbalance:
+      enabled: true

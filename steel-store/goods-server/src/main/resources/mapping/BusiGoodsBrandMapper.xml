@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ryit.goods.mapper.BusiGoodsBrandMapper">
+    <resultMap id="BaseResultMap" type="com.ryit.commons.entity.pojo.BusiGoodsBrand">
+        <id column="id" jdbcType="BIGINT" property="id"/>
+        <result column="brand_name" jdbcType="VARCHAR" property="brandName"/>
+        <result column="img_path" jdbcType="VARCHAR" property="imgPath"/>
+        <result column="parent_id" jdbcType="BIGINT" property="parentId"/>
+        <result column="levels" jdbcType="INTEGER" property="levels"/>
+        <result column="sort" jdbcType="INTEGER" property="sort"/>
+        <result column="create_user_id" jdbcType="INTEGER" property="createUserId"/>
+        <result column="create_date" jdbcType="TIMESTAMP" property="createDate"/>
+        <result column="last_update_user_id" jdbcType="INTEGER" property="lastUpdateUserId"/>
+        <result column="last_update_date" jdbcType="TIMESTAMP" property="lastUpdateDate"/>
+    </resultMap>
+    <sql id="Base_Column_List">
+        id, brand_name, img_path, parent_id, levels, sort, create_user_id, create_date,
+        last_update_user_id, last_update_date
+    </sql>
+</mapper>
