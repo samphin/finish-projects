@@ -1,0 +1,56 @@
+spring:
+  application:
+    name: eureka-server
+  main:
+    allow-bean-definition-overriding: true
+
+server:
+  port: 8080
+eureka:
+  server:
+    #    连接对等节点服务器复制的超时的时间
+    peer-node-connect-timeout-ms: 2000
+    #    读取对等节点服务器复制的超时的时间
+    peer-node-read-timeout-ms: 2000
+    #    自我保护模式
+    enable-self-preservation: false
+    #    清理无效节点的时间间隔
+    eviction-interval-timer-in-ms: 6000
+    #    集群节点之间的复制是否批处理
+    batch-replication: false
+management:
+  endpoints:
+    web:
+      exposure:
+        include: "*"
+  endpoint:
+    health:
+      show-details: ALWAYS
+
+---
+server:
+  port: 8080
+eureka:
+  instance:
+    hostname: zone
+  client:
+    service-url:
+      defaultZone: http://zone1:8081/eureka
+    register-with-eureka: true
+    fetch-registry: true
+spring:
+  profiles: zone
+
+---
+server:
+  port: 8081
+eureka:
+  instance:
+    hostname: zone1
+  client:
+    service-url:
+      defaultZone: http://zone:8080/eureka
+    register-with-eureka: true
+    fetch-registry: true
+spring:
+  profiles: zone1

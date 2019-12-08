@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ryit.order.mapper.BusiOrderReturnMapper">
+    <resultMap id="BaseResultMap" type="com.ryit.commons.entity.pojo.BusiOrderReturn">
+        <id column="id" jdbcType="BIGINT" property="id"/>
+        <result column="order_id" jdbcType="BIGINT" property="orderId"/>
+        <result column="order_no" jdbcType="VARCHAR" property="orderNo"/>
+        <result column="goods_id" jdbcType="BIGINT" property="goodsId"/>
+        <result column="sku_id" jdbcType="BIGINT" property="skuId"/>
+        <result column="price" jdbcType="DECIMAL" property="price"/>
+        <result column="nums" jdbcType="INT" property="nums"/>
+        <result column="type" jdbcType="SMALLINT" property="type"/>
+        <result column="reason" jdbcType="VARCHAR" property="reason"/>
+        <result column="remark" jdbcType="VARCHAR" property="remark"/>
+        <result column="imgs" jdbcType="VARCHAR" property="imgs"/>
+        <result column="apply_time" jdbcType="TIMESTAMP" property="applyTime"/>
+        <result column="status" jdbcType="SMALLINT" property="status"/>
+        <result column="version" jdbcType="INT" property="version"/>
+        <result column="create_user_id" jdbcType="VARCHAR" property="createUserId"/>
+        <result column="create_date" jdbcType="TIMESTAMP" property="createDate"/>
+    </resultMap>
+    <sql id="Base_Column_List">
+    id, order_id, order_no, goods_id, sku_id, price, nums, `type`
+    , reason, remark, imgs, apply_time, status,version,create_user_id,create_date
+  </sql>
+
+    <insert id="insertBusIOrderRefundInfo" parameterType="com.ryit.commons.entity.pojo.BusiOrderReturn">
+        insert into busi_order_return (id, order_id, order_no,goods_id,
+        sku_id, price,nums,`type`, reason,remark,imgs,
+        apply_time, status, version,
+        create_user_id, create_date)
+        values
+            (#{id,jdbcType=BIGINT}, #{orderId,jdbcType=BIGINT}, #{orderNo,jdbcType=VARCHAR},
+            #{goodsId,jdbcType=BIGINT}, #{skuId,jdbcType=BIGINT}, #{price,jdbcType=DECIMAL},
+            #{nums,jdbcType=INTEGER}, #{type,jdbcType=SMALLINT},#{reason,jdbcType=VARCHAR},
+            #{remark,jdbcType=VARCHAR},#{imgs,jdbcType=VARCHAR},#{applyTime,jdbcType=TIMESTAMP},
+            #{status,jdbcType=SMALLINT}, #{version,jdbcType=INT}), #{createUserId,jdbcType=VARCHAR}),
+            #{createDate,jdbcType=TIMESTAMP})
+    </insert>
+</mapper>

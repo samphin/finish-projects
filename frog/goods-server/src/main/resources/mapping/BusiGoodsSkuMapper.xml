@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ryit.goods.mapper.BusiGoodsSkuMapper">
+    <resultMap id="BaseResultMap" type="com.ryit.commons.entity.pojo.BusiGoodsSku">
+        <id column="id" jdbcType="BIGINT" property="id" />
+        <result column="goods_id" jdbcType="INTEGER" property="goodsId" />
+        <result column="length" jdbcType="DECIMAL" property="length" />
+        <result column="width" jdbcType="DECIMAL" property="width" />
+        <result column="thickness" jdbcType="DECIMAL" property="thickness" />
+        <result column="weight" jdbcType="DECIMAL" property="weight" />
+        <result column="scrap_iron_weight" jdbcType="DECIMAL" property="scrapIronWeight" />
+        <result column="amount" jdbcType="INTEGER" property="amount" />
+        <result column="colour" jdbcType="VARCHAR" property="colour" />
+        <result column="name" jdbcType="VARCHAR" property="name" />
+        <result column="org_id" jdbcType="BIGINT" property="orgId" />
+        <result column="sort" jdbcType="INTEGER" property="sort" />
+        <result column="price" jdbcType="DECIMAL" property="price" />
+        <result column="total_price" jdbcType="DECIMAL" property="totalPrice" />
+        <result column="create_user_id" jdbcType="INTEGER" property="createUserId" />
+        <result column="create_date" jdbcType="TIMESTAMP" property="createDate" />
+        <result column="last_update_user_id" jdbcType="INTEGER" property="lastUpdateUserId" />
+        <result column="last_update_date" jdbcType="TIMESTAMP" property="lastUpdateDate" />
+        <result column="version" jdbcType="INTEGER" property="version" />
+    </resultMap>
+    <sql id="Base_Column_List">
+        id, goods_id, `length`, width, thickness, weight, scrap_iron_weight, amount, colour,
+        `name`, org_id, sort, price, total_price, create_user_id, create_date, last_update_user_id,
+        last_update_date, version
+    </sql>
+
+    <!--批量保存规格-->
+    <insert id="insertBatch" parameterType="com.ryit.commons.entity.pojo.BusiGoodsSku">
+        insert into busi_goods_sku (id, weight, goods_id,
+        `length`, width, thickness,
+        amount, colour, `name`,
+        org_id, sort, price,total_price,
+        create_user_id, create_date)
+        values
+        <foreach collection="list" index="index" item="item" separator=",">
+            (
+            #{item.id,jdbcType=BIGINT},
+            #{item.weight,jdbcType=DECIMAL},
+            #{item.goodsId,jdbcType=BIGINT},
+            #{item.length,jdbcType=DECIMAL},
+            #{item.width,jdbcType=DECIMAL},
+            #{item.thickness,jdbcType=DECIMAL},
+            #{item.amount,jdbcType=INTEGER},
+            #{item.colour,jdbcType=VARCHAR},
+            #{item.name,jdbcType=VARCHAR},
+            #{item.orgId,jdbcType=BIGINT},
+            #{item.sort,jdbcType=INTEGER},
+            #{item.price,jdbcType=DECIMAL},
+            #{item.totalPrice,jdbcType=DECIMAL},
+            #{item.createUserId,jdbcType=INTEGER},
+            #{item.createDate,jdbcType=TIMESTAMP}
+            )
+        </foreach>
+    </insert>
+</mapper>

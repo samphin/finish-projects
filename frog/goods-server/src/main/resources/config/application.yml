@@ -1,0 +1,26 @@
+server:
+  port: 8083
+eureka:
+  client:
+    service-url:
+      defaultZone: http://zone:8080/eureka
+spring:
+  application:
+    name: goods-server
+
+#分布式事务
+# 默认之配置为TM的本机默认端口
+# tx-manager 的配置地址，可以指定TM集群中的任何一个或多个地址
+# tx-manager 下集群策略，每个TC都会从始至终<断线重连>与TM集群保持集群大小个连接。
+# TM方，每有TM进入集群，会找到所有TC并通知其与新TM建立连接。
+# TC方，启动时按配置与集群建立连接，成功后，会再与集群协商，查询集群大小并保持与所有TM的连接u
+tx-lcn:
+  client:
+    manager-address: zone:8070
+  # 是否启动LCN负载均衡策略(优化选项，开启与否，功能不受影响)
+  ribbon:
+    loadbalancer:
+      dtx.enabled: true
+  springcloud:
+    loadbalance:
+      enabled: true

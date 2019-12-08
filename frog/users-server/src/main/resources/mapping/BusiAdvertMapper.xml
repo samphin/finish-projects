@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ryit.users.mapper.BusiAdvertMapper">
+    <resultMap id="BaseResultMap" type="com.ryit.commons.entity.pojo.BusiAdvert">
+        <id column="id" jdbcType="BIGINT" property="id"/>
+        <result column="title" jdbcType="VARCHAR" property="title"/>
+        <result column="type" jdbcType="TINYINT" property="type"/>
+        <result column="url" jdbcType="VARCHAR" property="url"/>
+        <result column="release_status" jdbcType="TINYINT" property="releaseStatus"/>
+        <result column="valid_status" jdbcType="TINYINT" property="validStatus"/>
+        <result column="sort" jdbcType="INTEGER" property="sort"/>
+        <result column="home_status" jdbcType="TINYINT" property="homeStatus"/>
+        <result column="start_date" jdbcType="TIMESTAMP" property="startDate"/>
+        <result column="end_date" jdbcType="TIMESTAMP" property="endDate"/>
+        <result column="version" jdbcType="INTEGER" property="version"/>
+        <result column="create_user_id" jdbcType="INTEGER" property="createUserId"/>
+        <result column="create_date" jdbcType="TIMESTAMP" property="createDate"/>
+        <result column="last_update_user_id" jdbcType="INTEGER" property="lastUpdateUserId"/>
+        <result column="last_update_date" jdbcType="TIMESTAMP" property="lastUpdateDate"/>
+    </resultMap>
+    <sql id="Base_Column_List">
+        id, title, `type` url, release_status, valid_status, sort, home_status, start_date,
+        end_date,`version`, create_user_id, create_date, last_update_user_id, last_update_date
+    </sql>
+
+    <select id="selectAdvertInfo" resultType="com.ryit.commons.entity.vo.BusiHomePageAdvertVo">
+        select
+            ba.id,
+            ba.title,
+            ba.type,
+            ba.release_status as releaseStatus,
+            ba.valid_status as validStatus,
+            ba.home_status as homeStatus,
+            bai.path as imgPath
+        from busi_advert ba left join busi_advert_img bai on ba.id = bai.advert_id
+        where bai.sort = 0
+        order by ba.sort
+    </select>
+
+    <select id="selectList" parameterType="com.ryit.commons.entity.pojo.BusiAdvert" resultMap="BaseResultMap">
+        select
+        <include refid="Base_Column_List"/>
+        from busi_advert
+        <where>
+            <if test="title != null and title != ''">
+                title like concat('%',#{title,jdbcType=VARCHAR},'%')
+            </if>
+            <if test="releaseStatus != null">
+                and release_status = #{releaseStatus,jdbcType=INTEGER}
+            </if>
+            <if test="homeStatus != null">
+                and home_status = #{homeStatus,jdbcType=INTEGER}
+            </if>
+        </where>
+    </select>
+</mapper>

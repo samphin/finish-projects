@@ -1,0 +1,116 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ryit.users.mapper.BusiMembershipMapper">
+    <resultMap id="BaseResultMap" type="com.ryit.commons.entity.pojo.BusiMembership">
+        <id column="id" jdbcType="BIGINT" property="id"/>
+        <result column="user_id" jdbcType="INTEGER" property="userId"/>
+        <result column="level" jdbcType="SMALLINT" property="level"/>
+        <result column="bonus_points" jdbcType="INTEGER" property="bonusPoints"/>
+        <result column="credit_value" jdbcType="INTEGER" property="creditValue"/>
+        <result column="store_id" jdbcType="INTEGER" property="storeId"/>
+        <result column="money" jdbcType="DOUBLE" property="money"/>
+        <result column="freeze_money" jdbcType="DOUBLE" property="freezeMoney"/>
+        <result column="pay_password" jdbcType="VARCHAR" property="payPassword"/>
+        <result column="code" jdbcType="VARCHAR" property="code"/>
+        <result column="status" jdbcType="SMALLINT" property="status"/>
+        <result column="valid_status" jdbcType="SMALLINT" property="validStatus"/>
+        <result column="trade_status" jdbcType="SMALLINT" property="tradeStatus"/>
+        <result column="audit_status" jdbcType="SMALLINT" property="auditStatus"/>
+        <result column="create_user_id" jdbcType="INTEGER" property="createUserId"/>
+        <result column="create_date" jdbcType="TIMESTAMP" property="createDate"/>
+        <result column="last_update_user_id" jdbcType="INTEGER" property="lastUpdateUserId"/>
+        <result column="last_update_date" jdbcType="TIMESTAMP" property="lastUpdateDate"/>
+    </resultMap>
+    <sql id="Base_Column_List">
+        id, user_id, `level`, bonus_points, credit_value, store_id, money, freeze_money,
+        pay_password, code, `status`, valid_status, trade_status, audit_status, create_user_id,
+        create_date, last_update_user_id, last_update_date
+    </sql>
+
+    <!--会员列表查询-->
+    <select id="selectMemberList"
+            parameterType="com.ryit.commons.entity.dto.BusiMembershipDto"
+            resultType="com.ryit.commons.entity.vo.BusiMembershipVo">
+        select
+        bm.id,
+        bm.user_id as userId,
+        bm.money,
+        bm.level,
+        bm.bonus_points as bonusPoints,
+        bm.freeze_money as freezeMoney,
+        bm.credit_value as creditValue,
+        bm.code,
+        bm.create_date as createDate,
+        bm.status,
+        bm.valid_status as validStatus,
+        su.real_name as realName,
+        su.username,
+        su.mobile_phone as mobilePhone,
+        su.avatar,
+        su.birthday,
+        su.email,
+        su.id_card as idCard,
+        su.sex
+        from busi_membership bm left join sys_user su on bm.user_id = su.id
+        <where>
+            bm.trade_status = 2
+            <if test="username != null and username != ''">
+                and su.username like concat('%',#{username,jdbcType=VARCHAR},'%')
+            </if>
+            <if test="realName != null and realName != '' != null">
+                and su.real_name like concat('%',#{realName,jdbcType=VARCHAR},'%')
+            </if>
+            <if test="mobilePhone != null and mobilePhone != ''">
+                and su.mobile_phone like concat('%',#{mobilePhone,jdbcType=VARCHAR},'%')
+            </if>
+            <if test="sex != null">
+                and su.sex = #{sex,jdbcType=INTEGER}
+            </if>
+            <if test="createStartDate != null and createEndDate != null">
+                and bm.create_date between #{createStartDate} and #{createEndDate}
+            </if>
+        </where>
+    </select>
+
+    <!--会员详情-->
+    <select id="selectMemberDetail"
+            parameterType="integer"
+            resultType="com.ryit.commons.entity.vo.BusiMembershipVo">
+        select
+        bm.id,
+        bm.user_id as userId,
+        bm.money,
+        bm.level,
+        bm.bonus_points as bonusPoints,
+        bm.freeze_money as freezeMoney,
+        bm.credit_value as creditValue,
+        bm.code,
+        bm.create_date as createDate,
+        bm.status,
+        bm.valid_status as validStatus,
+        su.real_name as realName,
+        su.username,
+        su.mobile_phone as mobilePhone,
+        su.avatar,
+        su.birthday,
+        su.email,
+        su.id_card as idCard,
+        su.sex
+        from busi_membership bm left join sys_user su on bm.user_id = su.id
+        where bm.trade_status = 2 and bm.user_id = #{userId,jdbcType=INTEGER}
+    </select>
+
+    <!--统计会员订单数量排行榜-->
+    <select id="selectMemberOrderNum" resultType="com.ryit.commons.entity.vo.BusiMemberOrderVo">
+        SELECT * FROM (
+            SELECT
+            su.`real_name` AS memberRealName,
+            COUNT(bo.id) AS memberOrderNum
+            FROM busi_order bo
+            LEFT JOIN sys_user su ON bo.`create_user_id` = su.`id`
+            LEFT JOIN busi_membership bm ON su.`id` = bm.`user_id`
+            WHERE bm.`trade_status` = 2
+            GROUP BY bo.`create_user_id`
+        ) t ORDER BY t.memberOrderNum DESC
+    </select>
+</mapper>

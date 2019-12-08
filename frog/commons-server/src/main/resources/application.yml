@@ -1,0 +1,125 @@
+spring:
+  #redis配置
+  redis:
+    host: 111.229.49.130
+    port: 6379
+    timeOut: 86400
+    database: 0
+    lettuce:
+      pool:
+        # 连接池最大连接数（使用负值表示没有限制）
+        max-active: -1
+        # 连接池最大阻塞等待时间（使用负值表示没有限制）
+        max-wait: -1
+        # 连接池中的最大空闲连接
+        max-idle: 8
+        # 连接池中的最小空闲连接
+        min-idle: 0
+  #Mongodb
+  data:
+    mongodb:
+      uri: mongodb://root:root@111.229.49.130:27017/test
+      username: root
+      password: root
+      database: test
+      host: 111.229.49.130
+      port: 27017
+  servlet:
+    multipart:
+      max-file-size: 100MB # 单个文件大小
+      max-request-size: 100MB # 设置总上传的数据大小
+      enabled: true #开启
+  main:
+    allow-bean-definition-overriding: true
+  #json序列化
+  jackson:
+    date-format: yyyy-MM-dd HH:mm:ss
+    time-zone: GMT+8
+
+#全局断路器配置
+hystrix:
+  command:
+    default:
+      execution:
+        timeout:
+          enabled: true
+        isolation:
+          thread:
+            timeoutInMilliseconds: 30000 # 设置hystrix的超时时间为30000ms
+
+ribbon:
+  #请求处理超时
+  ReadTimeout: 10000
+  #请求连接超时
+  ConnectTimeout: 10000
+  #首选实例重试次数
+  MaxAutoRetries: 1
+  #更新实例重试次数
+  MaxAutoRetriesNextServer: 2
+  restclient:
+    enabled: true
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: "*"
+  endpoint:
+    health:
+      show-details: ALWAYS
+
+# JWT认证加密私钥(Base64加密)
+encryptJWTKey: MTIzNDU2
+# AccessToken过期时间(秒为单位，默认1天)
+accessTokenExpireTime: 86400 #60*60*24*365
+# RefreshToken过期时间(秒为单位，默认1天)
+refreshTokenExpireTime: 86400 #60*60*24*365
+# Shiro缓存过期时间(秒为单位)(一般设置与AccessToken过期时间一致)
+shiroCacheExpireTime: 31536000 #60*60*24*365
+
+# 日志配置
+logging:
+  level:
+    com.codingapi.txlcn: DEBUG
+    org.springframework: WARN
+    org.spring.springboot.dao: DEBUG
+
+# MyBatis
+mybatis:
+  # 搜索指定包别名
+  type-aliases-package: com.ryit.commons.entity.pojo
+  # 配置mapper的扫描，找到所有的mapper.xml映射文件
+  mapper-locations: classpath:mapping/*Mapper.xml
+  # 全局配置
+  configuration:
+    #手动设置驼峰写转换
+    map-underscore-to-camel-case: true
+    # 开启二级缓存
+    cache-enabled: true
+    # 配置默认的执行器
+    default-executor-type: reuse
+    # 指定日志的具体实现
+    log-impl: org.apache.ibatis.logging.stdout.StdOutImpl
+
+#分页参数
+pagehelper:
+  params: pageNum=pageNum;pageSize=pageSize;
+  offset-as-page-num: true
+  row-bounds-with-count: true
+  page-size-zero: true
+  # 禁用分页参数合理化，如果页数不对返回空数据
+  reasonable: false
+  default-page-size: 10
+  helper-dialect: mysql
+
+#服务之间调用时超时时间配置
+server:
+  connection-timeout: 180000
+#启用Apache-httpClient
+feign:
+  httpclient:
+    enabled: true
+
+#启用swagger
+swagger:
+  enable: true

@@ -1,0 +1,78 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ryit.order.mapper.BusiOrderGoodsMapper">
+    <resultMap id="BaseResultMap" type="com.ryit.commons.entity.pojo.BusiOrderGoods">
+        <id column="id" jdbcType="BIGINT" property="id"/>
+        <result column="org_id" jdbcType="BIGINT" property="orgId"/>
+        <result column="order_id" jdbcType="BIGINT" property="orderId"/>
+        <result column="goods_id" jdbcType="BIGINT" property="goodsId"/>
+        <result column="goods_name" jdbcType="VARCHAR" property="goodsName"/>
+        <result column="goods_img" jdbcType="VARCHAR" property="goodsImg"/>
+        <result column="sku_id" jdbcType="BIGINT" property="skuId"/>
+        <result column="sku_num" jdbcType="INTEGER" property="skuNum"/>
+        <result column="sku_price" jdbcType="DECIMAL" property="skuPrice"/>
+        <result column="sku_total_price" jdbcType="DECIMAL" property="skuTotalPrice"/>
+        <result column="discount_price" jdbcType="DECIMAL" property="discountPrice"/>
+        <result column="sku_cost_price" jdbcType="DECIMAL" property="skuCostPrice"/>
+        <result column="pick_code" jdbcType="VARCHAR" property="pickCode"/>
+        <result column="bar_code" jdbcType="VARCHAR" property="barCode"/>
+        <result column="comment_status" jdbcType="TINYINT" property="commentStatus"/>
+        <result column="activity_type" jdbcType="TINYINT" property="activityType"/>
+        <result column="activity_id" jdbcType="INTEGER" property="activityId"/>
+        <result column="send_status" jdbcType="TINYINT" property="sendStatus"/>
+        <result column="pick_status" jdbcType="TINYINT" property="pickStatus"/>
+        <result column="delivery_id" jdbcType="BIGINT" property="deliveryId"/>
+        <result column="version" jdbcType="INTEGER" property="version"/>
+        <result column="create_user_id" jdbcType="INTEGER" property="createUserId"/>
+        <result column="create_date" jdbcType="TIMESTAMP" property="createDate"/>
+    </resultMap>
+    <sql id="Base_Column_List">
+        id, org_id, order_id, goods_id, goods_name, goods_img, sku_id, sku_num, sku_price,sku_total_price,
+        discount_price, sku_cost_price, pick_code, bar_code, comment_status, activity_type,
+        activity_id, send_status, pick_status, delivery_id, version,create_user_id,create_date
+    </sql>
+
+    <insert id="insertBatch" parameterType="com.ryit.commons.entity.pojo.BusiOrderGoods">
+        insert into busi_order_goods(id, order_id, goods_id, goods_name,goods_img, sku_id, sku_num,
+        sku_price,sku_total_price,create_user_id,create_date)
+        values
+        <foreach collection="list" item="item" index="index" separator=",">
+            (
+            #{item.id,jdbcType=BIGINT},
+            #{item.orderId,jdbcType=BIGINT},
+            #{item.goodsId,jdbcType=BIGINT},
+            #{item.goodsName,jdbcType=VARCHAR},
+            #{item.goodsImg,jdbcType=VARCHAR},
+            #{item.skuId,jdbcType=BIGINT},
+            #{item.skuNum,jdbcType=INTEGER},
+            #{item.skuPrice,jdbcType=DOUBLE},
+            #{item.skuTotalPrice,jdbcType=DOUBLE},
+            #{item.createUserId,jdbcType=INTEGER},
+            #{item.createDate,jdbcType=TIMESTAMP}
+            )
+        </foreach>
+    </insert>
+
+    <select id="queryOrderGoodsList" parameterType="long" resultType="com.ryit.commons.entity.vo.BusiOrderGoodsListVo">
+        select
+        bog.goods_id as goodsId,
+        bog.goods_name as goodsName,
+        bog.goods_img as goodsImg,
+        bgs.id as skuId,
+        bgs.length,
+        bgs.width,
+        bgs.thickness,
+        bgs.weight,
+        bgs.amount,
+        bgs.price,
+        bgs.total_price as totalPrice,
+        bog.comment_status as commentStatus,
+        bog.activity_type as activityType,
+        bog.send_status as sendStatus,
+        bog.pick_status as pickStatus
+        from busi_order_goods bog
+        left join busi_goods_sku bgs on bog.sku_id = bgs.id
+        where bog.order_id = #{orderId,jdbcType=BIGINT}
+        order by bog.create_date desc
+    </select>
+</mapper>

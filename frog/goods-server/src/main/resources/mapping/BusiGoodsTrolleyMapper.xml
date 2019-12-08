@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ryit.goods.mapper.BusiGoodsTrolleyMapper">
+    <resultMap id="BaseResultMap" type="com.ryit.commons.entity.pojo.BusiGoodsTrolley">
+        <id column="id" jdbcType="BIGINT" property="id"/>
+        <result column="goods_id" jdbcType="BIGINT" property="goodsId"/>
+        <result column="goods_name" jdbcType="VARCHAR" property="goodsName"/>
+        <result column="goods_img" jdbcType="VARCHAR" property="goodsImg"/>
+        <result column="length" jdbcType="DECIMAL" property="length"/>
+        <result column="width" jdbcType="DECIMAL" property="width"/>
+        <result column="thickness" jdbcType="DECIMAL" property="thickness"/>
+        <result column="weight" jdbcType="DECIMAL" property="weight"/>
+        <result column="amount" jdbcType="INTEGER" property="amount"/>
+        <result column="price" jdbcType="DECIMAL" property="price"/>
+        <result column="total_price" jdbcType="DECIMAL" property="totalPrice"/>
+        <result column="del_status" jdbcType="TINYINT" property="delStatus"/>
+        <result column="version" jdbcType="INTEGER" property="version"/>
+        <result column="create_user_id" jdbcType="INTEGER" property="createUserId"/>
+        <result column="create_date" jdbcType="TIMESTAMP" property="createDate"/>
+        <result column="last_update_user_id" jdbcType="INTEGER" property="lastUpdateUserId"/>
+        <result column="last_update_date" jdbcType="TIMESTAMP" property="lastUpdateDate"/>
+    </resultMap>
+    <sql id="Base_Column_List">
+        id, goods_id, goods_name, goods_img, `length`, width, thickness, weight,
+        amount, price, total_price, del_status, version, create_user_id, create_date, last_update_user_id,
+        last_update_date
+    </sql>
+
+    <!--查询我的购物车-->
+    <select id="selectMyTrolley" parameterType="integer" resultMap="BaseResultMap">
+        SELECT <include refid="Base_Column_List"/> from busi_goods_trolley
+        WHERE `create_user_id` = #{userId,jdbcType=INTEGER}
+    </select>
+
+    <insert id="insertBatch" parameterType="com.ryit.commons.entity.pojo.BusiGoodsTrolley">
+        insert into busi_goods_trolley
+        (id,goods_id, goods_name, goods_img, `length`, width, thickness, weight,
+        amount, price, total_price,create_user_id,create_date)
+        values
+        <foreach collection="list" item="item" index="index" separator=",">
+            (
+            #{item.id,jdbcType=BIGINT},
+            #{item.goodsId,jdbcType=BIGINT},
+            #{item.goodsName,jdbcType=VARCHAR},
+            #{item.goodsImg,jdbcType=VARCHAR},
+            #{item.length,jdbcType=DOUBLE},
+            #{item.width,jdbcType=DOUBLE},
+            #{item.thickness,jdbcType=DOUBLE},
+            #{item.weight,jdbcType=DOUBLE},
+            #{item.amount,jdbcType=INTEGER},
+            #{item.price,jdbcType=DOUBLE},
+            #{item.totalPrice,jdbcType=DOUBLE},
+            #{item.createUserId,jdbcType=INTEGER},
+            #{item.createDate,jdbcType=TIMESTAMP}
+            )
+        </foreach>
+    </insert>
+
+    <delete id="deleteBatch" parameterType="list">
+        delete from busi_goods_trolley where id in
+        <foreach collection="list" item="id" index="index" separator="," open="(" close=")">
+            #{id,jdbcType=BIGINT}
+        </foreach>
+    </delete>
+</mapper>

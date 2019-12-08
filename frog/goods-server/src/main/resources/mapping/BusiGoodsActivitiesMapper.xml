@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ryit.goods.mapper.BusiGoodsActivitiesMapper">
+    <resultMap id="BaseResultMap" type="com.ryit.commons.entity.pojo.BusiGoodsActivities">
+        <!--@mbg.generated-->
+        <!--@Table busi_goods_activities-->
+        <id column="id" jdbcType="BIGINT" property="id"/>
+        <result column="goods_id" jdbcType="BIGINT" property="goodsId"/>
+        <result column="sku_id" jdbcType="BIGINT" property="skuId"/>
+        <result column="org_id" jdbcType="BIGINT" property="orgId"/>
+        <result column="name" jdbcType="VARCHAR" property="name"/>
+        <result column="price" jdbcType="DOUBLE" property="price"/>
+        <result column="start_time" jdbcType="TIMESTAMP" property="startTime"/>
+        <result column="end_time" jdbcType="TIMESTAMP" property="endTime"/>
+        <result column="visible" jdbcType="BOOLEAN" property="visible"/>
+        <result column="image_url" jdbcType="VARCHAR" property="imageUrl"/>
+        <result column="page_url" jdbcType="VARCHAR" property="pageUrl"/>
+        <result column="create_user_id" jdbcType="INTEGER" property="createUserId"/>
+        <result column="create_date" jdbcType="TIMESTAMP" property="createDate"/>
+        <result column="last_update_user_id" jdbcType="INTEGER" property="lastUpdateUserId"/>
+        <result column="last_update_date" jdbcType="TIMESTAMP" property="lastUpdateDate"/>
+    </resultMap>
+    <sql id="Base_Column_List">
+        <!--@mbg.generated-->
+        id, goods_id, sku_id, org_id, `name`, price, start_time, end_time, visible, image_url,
+        page_url, create_user_id, create_date, last_update_user_id, last_update_date
+    </sql>
+
+</mapper>
