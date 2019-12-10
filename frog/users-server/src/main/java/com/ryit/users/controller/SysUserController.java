@@ -96,6 +96,7 @@ public class SysUserController {
             return ResponseData.failure();
         }
     }
+
     //=================================API接口 Start======================================
 
     //============================PC端管理后台接口 Start====================================
@@ -131,6 +132,13 @@ public class SysUserController {
     public ResponseData queryMyInfo(@PathVariable Integer id) {
         SysUserVo vo = sysUserService.queryMyInfo(id);
         return ResponseData.success().setData(vo);
+    }
+
+    @ApiOperation(value = "查询咨询用户信息", httpMethod = "GET", notes = "查询咨询用户信息")
+    @GetMapping(BaseUrlConstants.BASE_ADMIN_PREFIX + "/users")
+    public ResponseData queryAdvisoryUserList() {
+        PageBean<SysBuyerListVo> voList = sysUserService.queryBuyers(null);
+        return ResponseData.success().setData(voList);
     }
 
     /**

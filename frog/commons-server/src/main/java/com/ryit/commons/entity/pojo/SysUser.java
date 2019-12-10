@@ -47,6 +47,11 @@ public class SysUser extends BasePo<Integer, SysUserDto, SysUser> implements Ser
     private String realName;
 
     /**
+     * 访问类型 1-随时 2-上班时间 3-下班时间
+     */
+    private Integer accessDateType;
+
+    /**
      * 性别：0-男 1-女 2-其他
      */
     private Integer sex;

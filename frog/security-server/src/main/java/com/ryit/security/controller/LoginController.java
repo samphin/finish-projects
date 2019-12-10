@@ -6,6 +6,7 @@ import com.ryit.commons.constants.BaseUrlConstants;
 import com.ryit.commons.constants.JwtConstant;
 import com.ryit.commons.constants.RedisConstants;
 import com.ryit.commons.entity.dto.LoginDto;
+import com.ryit.commons.entity.dto.RegisterDto;
 import com.ryit.commons.entity.dto.SysUserDto;
 import com.ryit.commons.entity.pojo.SysUser;
 import com.ryit.commons.entity.vo.LoginUserInfoVo;
@@ -20,7 +21,6 @@ import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.http.HttpStatus;
-import org.apache.shiro.authz.annotation.RequiresRoles;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.validation.annotation.Validated;
@@ -64,7 +64,7 @@ public class LoginController {
      * @since 2019-10-16 15:54:23
      */
     @ApiOperation(value = "系统登录", httpMethod = "POST")
-    @PostMapping(value={
+    @PostMapping(value = {
             BaseUrlConstants.BASE_API_PREFIX + "/login",
             BaseUrlConstants.BASE_ADMIN_PREFIX + "/login"
     })
@@ -113,19 +113,41 @@ public class LoginController {
         //获取请求地址
         String requestUrl = request.getRequestURI();
         //如果包含api，说明是APP【买家】登录，否则PC端【管理员、买家、超管角色】登录
-        if(requestUrl.contains("/api")){
-            boolean isBuyer = roles.stream().anyMatch(role->"BUYER".equals(role));
-            if(!isBuyer){
+        if (requestUrl.contains("/api")) {
+            boolean isBuyer = roles.stream().anyMatch(role -> "BUYER".equals(role));
+            if (!isBuyer) {
                 throw new CustomException(SystemErrorEnum.ILLEGAL_LOGIN_ERROR);
             }
-        }else{
-            boolean isAdmin = roles.stream().anyMatch(role->"SUP_ADMIN".equals(role) || "ADMIN".equals(role) || "SELLER".equals(role));
-            if(!isAdmin){
+        } else {
+            boolean isAdmin = roles.stream().anyMatch(role -> "SUP_ADMIN".equals(role) || "ADMIN".equals(role) || "SELLER".equals(role));
+            if (!isAdmin) {
                 throw new CustomException(SystemErrorEnum.ILLEGAL_LOGIN_ERROR);
             }
         }
 
         return getLoginUserInfo(user, response);
+    }
+
+    /**
+     * 快速注册用户
+     *
+     * @param request
+     * @return
+     */
+    @ApiOperation(value = "用户简单注册", httpMethod = "POST")
+    @PostMapping(value = BaseUrlConstants.BASE_API_PREFIX + "/simple-register")
+    public ResponseData simpleRegister(@RequestBody @Validated RegisterDto registerDto) {
+        SysUserDto dto = new SysUserDto();
+        dto.setUsername(registerDto.getTelephone());
+        dto.setRealName(registerDto.getRealName());
+        dto.setMobilePhone(registerDto.getTelephone());
+        dto.setAccessDateType(registerDto.getAccessDateType());
+        ResponseData<Boolean> registerResult = sysUserFeignClient.register(dto);
+        if (registerResult.getCode() != HttpStatus.SC_OK) {
+            throw new CustomException(registerResult.getMsg());
+        } else {
+            return ResponseData.success();
+        }
     }
 
     /**

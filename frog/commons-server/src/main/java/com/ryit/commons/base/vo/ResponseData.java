@@ -1,5 +1,6 @@
 package com.ryit.commons.base.vo;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
 import com.ryit.commons.enums.SystemErrorEnum;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.http.HttpStatus;
@@ -12,6 +13,7 @@ import java.io.Serializable;
  *
  * @author samphin
  */
+@JsonInclude(value = JsonInclude.Include.NON_EMPTY)
 public class ResponseData<T> implements Serializable {
 
     /**
@@ -43,6 +45,7 @@ public class ResponseData<T> implements Serializable {
 
     /**
      * 消息提醒
+     *
      * @param data
      * @return
      */

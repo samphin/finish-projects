@@ -5,6 +5,7 @@ import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 
+import javax.validation.constraints.NotNull;
 import java.io.Serializable;
 import java.util.Date;
 
@@ -58,6 +59,11 @@ public class SysUserDto extends BaseDto<Integer> implements Serializable {
      */
     @ApiModelProperty(value = "身份证号码", required = true)
     private String idCard;
+
+    /**
+     * 访问类型 1-随时 2-上班时间 3-下班时间
+     */
+    private Integer accessDateType;
 
     /**
      * 删除标识 0:有效 1:删除

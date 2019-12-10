@@ -9,7 +9,6 @@ import org.springframework.beans.BeanUtils;
 import org.springframework.util.CollectionUtils;
 
 import java.io.Serializable;
-import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -57,9 +56,8 @@ public class BaseVo<PK extends Serializable, P, V> implements Serializable {
      * @return
      */
     public List<V> buildVoList(List<P> poList) {
-        List<V> voList = new ArrayList<>();
         if (CollectionUtils.isEmpty(poList)) {
-            return voList;
+            return Lists.newArrayList();
         }
 
         return Lists.transform(poList, po -> {

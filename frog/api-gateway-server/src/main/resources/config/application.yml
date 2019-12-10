@@ -113,4 +113,4 @@ allowed-prefix: api,admin
 
 #不进行jwtToken校验的地址
 jwt:
-  ignore-url: /home_page,/login,/register,/unauth,/sms,/druid/**,/actuator/**
+  ignore-url: /home_page,/login,/register,/simple-register,/call-info,/unauth,/sms,/druid/**,/actuator/**
