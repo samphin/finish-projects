@@ -340,4 +340,15 @@ public class SysUserServiceImpl extends BaseServiceImpl<Integer, SysUserDto, Sys
 
         return getPageData(voList, page);
     }
+
+    /**
+     * 查询所有咨询用户列表
+     *
+     * @param queryDto
+     * @return
+     */
+    @Override
+    public List<SysBuyerListVo> queryAdvisoryUserList(SysBuyerQueryDto queryDto) {
+        return sysUserMapper.selectBuyers(queryDto);
+    }
 }

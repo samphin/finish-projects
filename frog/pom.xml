@@ -21,6 +21,7 @@
         <module>security-server</module>
         <module>order-server</module>
         <module>goods-server</module>
+        <module>easy-server</module>
     </modules>
 
     <parent>

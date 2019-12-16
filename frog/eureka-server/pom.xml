@@ -10,7 +10,7 @@
 
     <parent>
         <groupId>com.ryit</groupId>
-        <artifactId>steel-store</artifactId>
+        <artifactId>frog</artifactId>
         <version>0.0.1-SNAPSHOT</version>
     </parent>
 

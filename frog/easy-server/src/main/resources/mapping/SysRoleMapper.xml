@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.ryit.users.mapper.SysRoleMapper">
+    <resultMap id="BaseResultMap" type="com.ryit.commons.entity.pojo.SysRole">
+        <id column="id" jdbcType="INTEGER" property="id"/>
+        <result column="name" jdbcType="VARCHAR" property="name"/>
+        <result column="code" jdbcType="VARCHAR" property="code"/>
+        <result column="status" jdbcType="BOOLEAN" property="status"/>
+        <result column="description" jdbcType="VARCHAR" property="description"/>
+        <result column="version" jdbcType="INTEGER" property="version"/>
+        <result column="create_user_id" jdbcType="INTEGER" property="createUserId"/>
+        <result column="create_date" jdbcType="TIMESTAMP" property="createDate"/>
+        <result column="last_update_user_id" jdbcType="INTEGER" property="lastUpdateUserId"/>
+        <result column="last_update_date" jdbcType="TIMESTAMP" property="lastUpdateDate"/>
+    </resultMap>
+    <sql id="Base_Column_List">
+        id, `name`, code, `status`, description, version, create_user_id, create_date, last_update_user_id,
+        last_update_date
+    </sql>
+
+    <select id="selectList" parameterType="com.ryit.commons.entity.pojo.SysRole" resultMap="BaseResultMap">
+        select
+        <include refid="Base_Column_List"/>
+        from sys_role
+        <where>
+            <if test="name!=null and name != ''">
+                AND `name` like concat('%',#{name,jdbcType=VARCHAR},'%')
+            </if>
+            <if test="code != null and code != ''">
+                AND `code` like concat('%',#{code,jdbcType=VARCHAR},'%')
+            </if>
+            <if test="status!=null">
+                AND status = #{status,jdbcType=BIT}
+            </if>
+        </where>
+    </select>
+
+    <!--查询用户角色-->
+    <select id="selectUserHaveRoles" parameterType="java.lang.Integer" resultMap="BaseResultMap">
+        SELECT t1.id, t1.name,t1.code
+        FROM sys_role t1
+        left join sys_user_role_pk t2 ON t1.id = t2.role_id
+        WHERE t1.status = 1 and t2.user_id = #{userId,jdbcType=INTEGER}
+    </select>
+
+    <!--查询用户未拥有的角色-->
+    <select id="selectUserHaveNoRoles" resultMap="BaseResultMap">
+        SELECT t1.id, t1.name,t1.code
+        FROM sys_role t1
+        left join sys_user_role_pk t2 ON t1.id = t2.role_id
+        <where>
+            t1.status = 1 and t2.user_id != #{userId,jdbcType=INTEGER} and t2.user_id is null
+            <if test="name != null and name != ''">
+                and t1.name like concat('%', #{name,jdbcType=VARCHAR}, '%')
+            </if>
+        </where>
+    </select>
+
+    <!--查询用户角色信息-->
+    <select id="selectRolesByUserId" parameterType="integer" resultMap="BaseResultMap">
+        select distinct sr.code,sr.id from sys_user_role_pk surp left join sys_role sr on surp.role_id = sr.id
+        where surp.user_id = #{userId,jdbcType=INTEGER}
+    </select>
+</mapper>

@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.ryit.users.mapper.SysPermissionResourcePkMapper">
+    <resultMap id="BaseResultMap" type="com.ryit.commons.entity.pojo.SysPermissionResourcePk">
+        <result column="permission_id" property="permissionId" jdbcType="INTEGER"/>
+        <result column="resource_id" property="resourceId" jdbcType="INTEGER"/>
+        <result column="leaf" property="leaf" jdbcType="INTEGER"/>
+    </resultMap>
+
+    <sql id="Base_Column_List"> permission_id, resource_id ,leaf </sql>
+
+    <insert id="insertBatch" parameterType="java.util.List">
+        insert into sys_permission_resource_pk(permission_id,resource_id,leaf) values
+        <foreach collection="list" item="item" index="index" separator=",">
+            (
+                #{item.permissionId,jdbcType=INTEGER},
+                #{item.resourceId,jdbcType=INTEGER},
+                #{item.leaf,jdbcType=INTEGER}
+            )
+        </foreach>
+    </insert>
+
+    <select id="selectPermissionHaveResource" parameterType="integer"
+            resultMap="BaseResultMap">
+        select
+        <include refid="Base_Column_List"/>
+        from sys_permission_resource_pk where permission_id = #{permissionId,jdbcType=INTEGER} and leaf = 0
+    </select>
+</mapper>

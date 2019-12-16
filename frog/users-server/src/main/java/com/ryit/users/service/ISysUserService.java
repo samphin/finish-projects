@@ -131,4 +131,12 @@ public interface ISysUserService extends IBaseService<Integer, SysUserDto, SysUs
      * @return
      */
     PageBean<SysBuyerListVo> queryBuyers(BaseQueryDto<SysBuyerQueryDto> queryDto);
+
+    /**
+     * 查询所有咨询用户列表
+     *
+     * @param queryDto
+     * @return
+     */
+    List<SysBuyerListVo> queryAdvisoryUserList(SysBuyerQueryDto queryDto);
 }

@@ -53,9 +53,9 @@ public class Swagger2Config {
      */
     private ApiInfo apiInfo() {
         ApiInfo build = new ApiInfoBuilder()
-                .title("拼钢APP商城系统")
-                .description("拼钢APP商城系统接口文档说明")
-                .contact(new Contact("@软艺信息", "http://www.baidu.com", "670610973@qq.com"))
+                .title("青蛙养殖项目接口文档")
+                .description("青蛙养殖项目接口文档说明")
+                .contact(new Contact("@青蛙养殖技术分享", "http://www.baidu.com", "670610973@qq.com"))
                 .version("1.0")
                 .build();
         return build;

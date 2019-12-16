@@ -3,7 +3,6 @@ package com.ryit.commons.entity.dto;
 import lombok.Data;
 
 import java.io.Serializable;
-import java.util.Date;
 
 /**
  * 客户回访记录表
@@ -27,9 +26,4 @@ public class SysUserCallInfoDto implements Serializable {
      * 咨询人姓名
      */
     private String realName;
-
-    /**
-     * 回访时间
-     */
-    private Date createDate;
 }

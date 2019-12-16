@@ -136,8 +136,8 @@ public class SysUserController {
 
     @ApiOperation(value = "查询咨询用户信息", httpMethod = "GET", notes = "查询咨询用户信息")
     @GetMapping(BaseUrlConstants.BASE_ADMIN_PREFIX + "/users")
-    public ResponseData queryAdvisoryUserList() {
-        PageBean<SysBuyerListVo> voList = sysUserService.queryBuyers(null);
+    public ResponseData queryAdvisoryUserList(@ModelAttribute SysBuyerQueryDto queryDto) {
+        List<SysBuyerListVo> voList = sysUserService.queryAdvisoryUserList(queryDto);
         return ResponseData.success().setData(voList);
     }
 
