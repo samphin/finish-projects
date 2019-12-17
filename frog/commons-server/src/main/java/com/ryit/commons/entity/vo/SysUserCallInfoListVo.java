@@ -1,5 +1,6 @@
 package com.ryit.commons.entity.vo;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import com.ryit.commons.base.vo.BaseVo;
 import com.ryit.commons.entity.pojo.SysUserCallInfo;
 import lombok.Data;
@@ -28,5 +29,6 @@ public class SysUserCallInfoListVo extends BaseVo<Long, SysUserCallInfo, SysUser
     /**
      * 最近回访时间
      */
+    @JsonFormat(pattern = "yyyy-MM-dd",timezone = "GTM+8")
     private Date createDate;
 }
