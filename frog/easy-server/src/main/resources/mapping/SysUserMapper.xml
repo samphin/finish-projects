@@ -92,7 +92,7 @@
         su.id,
         su.username,
         su.real_name as realName,
-        su.mobile_phone as mobilePhone,
+        su.mobile_phone as telephone,
         su.access_date_type as accessDateType
         FROM sys_user su
         LEFT JOIN sys_user_role_pk surp ON su.`id` = surp.`user_id`

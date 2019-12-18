@@ -12,6 +12,7 @@ import org.springframework.web.bind.annotation.*;
 
 @Api(value = "SysUserCallController", tags = "用户回访接口")
 @RestController
+@CrossOrigin
 @RequestMapping(BaseUrlConstants.BASE_API_PREFIX + "/call-info")
 public class SysUserCallController {
 

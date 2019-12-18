@@ -15,7 +15,7 @@ public class SysBuyerListVo implements Serializable {
 
     private String realName;
 
-    private String mobilePhone;
+    private String telephone;
 
     /**
      * 访问类型 1-随时 2-上班时间 3-下班时间

@@ -28,6 +28,7 @@ import java.util.List;
 
 @Api(value = "SysUserController", tags = "用户管理接口")
 @RestController
+@CrossOrigin
 @RequestMapping
 public class SysUserController {
 
