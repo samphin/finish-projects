@@ -71,10 +71,10 @@ management:
 
 # JWT认证加密私钥(Base64加密)
 encryptJWTKey: MTIzNDU2
-# AccessToken过期时间(秒为单位，默认1天)
-accessTokenExpireTime: 86400 #60*60*24*365
-# RefreshToken过期时间(秒为单位，默认1天)
-refreshTokenExpireTime: 86400 #60*60*24*365
+# AccessToken过期时间(秒为单位，默认30分钟)
+accessTokenExpireTime: 1800
+# RefreshToken过期时间(秒为单位，默认30分钟)
+refreshTokenExpireTime: 1800
 # Shiro缓存过期时间(秒为单位)(一般设置与AccessToken过期时间一致)
 shiroCacheExpireTime: 31536000 #60*60*24*365
 

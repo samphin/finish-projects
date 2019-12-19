@@ -103,10 +103,14 @@ public class CustomGlobalFilter implements GlobalFilter, Ordered {
                         String currentTimeMillisRedis = redisUtil.get(String.format(RedisConstants.PREFIX_API_REFRESH_TOKEN, account));
                         // 获取Authorization时间戳，与RefreshToken的时间戳对比
                         if (JwtUtil.getClaim(jwtToken, JwtConstant.CURRENT_TIME_MILLIS).equals(currentTimeMillisRedis)) {
-                            //延长用户缓存时间
-                            redisUtil.expire(String.format(RedisConstants.PREFIX_USER_INFO, account), Integer.parseInt(accessTokenExpireTime));
-                            //延长用户token刷新的过期时间
-                            redisUtil.expire(String.format(RedisConstants.PREFIX_API_REFRESH_TOKEN, account), Integer.parseInt(refreshTokenExpireTime));
+                            //判断refreshToken与当前系统时间是否相差10分钟，超过10分钟，则延长token有效时间10分钟
+                            Long currentTimeMillis = System.currentTimeMillis();
+                            if(currentTimeMillis - Long.valueOf(currentTimeMillisRedis) > 10*60*1000){
+                                //延长用户缓存时间
+                                redisUtil.expire(String.format(RedisConstants.PREFIX_USER_INFO, account), Integer.parseInt(accessTokenExpireTime));
+                                //延长用户token刷新的过期时间
+                                redisUtil.expire(String.format(RedisConstants.PREFIX_API_REFRESH_TOKEN, account), Integer.parseInt(refreshTokenExpireTime));
+                            }
                             //将现在的request，添加当前身份
                             ServerHttpRequest mutableReq = request.mutate().header(JwtConstant.AUTHORIZATION, jwtToken).build();
                             ServerWebExchange mutableExchange = exchange.mutate().request(mutableReq).build();
