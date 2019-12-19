@@ -1,7 +1,7 @@
 spring:
   #redis配置
   redis:
-    host: 192.168.0.188
+    host: 111.229.49.130
     password: foobared
     port: 6379
     timeOut: 86400
@@ -19,11 +19,11 @@ spring:
   #Mongodb
   data:
     mongodb:
-      uri: mongodb://root:root@192.168.0.188:27017/test
+      uri: mongodb://root:root@111.229.49.130:27017/test
       username: root
       password: root
       database: test
-      host: 192.168.0.188
+      host: 111.229.49.130
       port: 27017
   servlet:
     multipart:
