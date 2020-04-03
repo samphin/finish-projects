@@ -1,8 +1,8 @@
 #product environment
 server-ip: 172.18.104.237
-redis-ip: 172.18.104.237
-redis-password: i-wz98o9
-manager-server: 172.18.104.237
+redis-ip: *
+redis-password: *
+manager-server: *
 datasource-username: credituser
 datasource-password: credituser
 
@@ -177,11 +177,11 @@ logging:
 # 微信相关配置
 wechat:
   #微信公众号的用户名
-  appid: wx6a05efee4cfd57cc
+  appid: *
   #密钥
-  app_secret: 0ADBCED5F3073274CA4EC6347DD13E1E
-  #商户号（东莞迅秒犇信息科技有限公司）
-  mch_id: 1556070901
+  app_secret: *
+  #商户号
+  mch_id: *
   #证书地址
   cert_path: abc.cert
   #微信回调方法
@@ -190,8 +190,8 @@ wechat:
 
 #用户身份证号和真实姓名相关配置
 idCard:
-  appId: 203746946
-  appSecret: u3xc05llkp1xole8wd2hkxt2i8y97uyh
+  appId: *
+  appSecret: *
   host: http://freeid.market.alicloudapi.com
   path: /idcard/VerifyIdcardv2
   appCode: 1e3d307ee47840b7b563197c1de7b3eb
